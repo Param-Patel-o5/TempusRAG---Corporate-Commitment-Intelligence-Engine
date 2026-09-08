@@ -278,17 +278,17 @@ def _extract_sections_from_text(text: str) -> dict[str, dict[str, str]]:
     text = re.sub(r"\n{3,}", "\n\n", text)
     text = text.strip()
     
-    # Patterns to look for section headings
+    # Patterns to look for section headings - ONLY reliable standardized 10-K patterns
     section_patterns = [
-        # Standard 10-K sections
+        # Standard 10-K sections - these are reliable across all filings
         r"^\s*ITEM\s+(\d+[A-Z]?)\.\s*(.+?)$",
         r"^\s*Item\s+(\d+[A-Z]?)\.\s*(.+?)$", 
         r"^\s*PART\s+([IVX]+)\s*(.*)$",
-        r"^\s*Part\s+([IVX]+)\s*(.*)$",
-        # All caps headings
-        r"^([A-Z][A-Z\s,&'\-\.\(\)\/]{10,})$",
-        # Title case headings
-        r"^([A-Z][A-Za-z\s,&'\-\.\(\)\/]{10,})$"
+        r"^\s*Part\s+([IVX]+)\s*(.*)$"
+        # NOTE: Removed all-caps and title-case fallback patterns as they are too loose
+        # and cause over-segmentation by matching normal prose as fake section headers.
+        # Accept coarser sections (fewer, larger sections keyed by Item number) rather 
+        # than noisy false splits - chunker.py handles further breaking down large sections.
     ]
     
     sections = {}
@@ -321,14 +321,9 @@ def _extract_sections_from_text(text: str) -> dict[str, dict[str, str]]:
                 is_header = True
                 break
         
-        # Additional heuristics for headers
-        if not is_header and len(line_stripped) > 10 and len(line_stripped) < 100:
-            # Check if it's likely a header based on context
-            if (line_stripped.isupper() or 
-                line_stripped.count(" ") < 10 and any(word in line_stripped.upper() for word in 
-                ["MANAGEMENT", "DISCUSSION", "ANALYSIS", "BUSINESS", "RISK", "FINANCIAL", "OPERATIONS"])):
-                is_header = True
-                section_name = line_stripped
+        # Additional heuristics for headers - REMOVED
+        # The all-caps and title-case heuristics were too loose and caused over-segmentation.
+        # Only rely on standardized Item/Part patterns which are reliable across all 10-K filings.
         
         if is_header and section_name:
             # Save previous section

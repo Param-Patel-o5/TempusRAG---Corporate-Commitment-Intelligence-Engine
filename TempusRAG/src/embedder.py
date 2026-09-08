@@ -231,6 +231,9 @@ def get_bm25_index(ticker: str) -> dict | None:
     """
     Get the BM25 index for a ticker.
     
+    If the BM25 index is missing but a ChromaDB collection exists, this function
+    will attempt to rebuild the BM25 index from the collection data.
+    
     Args:
         ticker: Company ticker symbol.
         
@@ -240,14 +243,76 @@ def get_bm25_index(ticker: str) -> dict | None:
     ticker_upper = ticker.upper()
     entry = _bm25_indices.get(ticker_upper)
     
-    if entry is None:
-        logger.warning(
-            f"No BM25 index found for {ticker_upper}. "
-            f"This may happen if the collection was fresh and embed_and_store_chunks was not called. "
-            f"Available indices: {list(_bm25_indices.keys())}"
-        )
+    if entry is not None:
+        return entry
     
-    return entry
+    # BM25 index is missing - try to rebuild from ChromaDB collection
+    logger.info(f"BM25 index missing for {ticker_upper}, attempting to rebuild from ChromaDB collection")
+    
+    try:
+        # Get the ChromaDB collection
+        collection = _chroma_client.get_collection(name=ticker_upper)
+        
+        # Get all documents and metadata from collection
+        results = collection.get(include=["documents", "metadatas"])
+        
+        if not results["ids"]:
+            logger.warning(f"ChromaDB collection {ticker_upper} is empty")
+            return None
+        
+        # Rebuild Chunk objects from ChromaDB data
+        chunks = []
+        for i, chunk_id in enumerate(results["ids"]):
+            document = results["documents"][i]
+            metadata = results["metadatas"][i]
+            
+            # Reconstruct Chunk object
+            chunk = Chunk(
+                chunk_id=chunk_id,
+                company=metadata["company"],
+                year=int(metadata["year"]),
+                section=metadata["section"],
+                subsection=metadata["subsection"],
+                text=document,
+                word_count=int(metadata["word_count"])
+            )
+            chunks.append(chunk)
+        
+        # Build BM25 index
+        tokenized_chunks = [tokenize_for_bm25(chunk.text) for chunk in chunks]
+        bm25_index = BM25Okapi(tokenized_chunks)
+        
+        # Store in global cache
+        _bm25_indices[ticker_upper] = {
+            "bm25": bm25_index,
+            "chunks": chunks
+        }
+        
+        logger.info(f"Successfully rebuilt BM25 index for {ticker_upper} with {len(chunks)} chunks")
+        return _bm25_indices[ticker_upper]
+        
+    except Exception as e:
+        logger.error(f"Failed to rebuild BM25 index for {ticker_upper}: {e}")
+        
+        # Check if this is because the collection doesn't exist vs other errors
+        try:
+            collection = _chroma_client.get_collection(name=ticker_upper)
+            if collection.count() == 0:
+                logger.warning(
+                    f"BM25 index for {ticker_upper} cannot be built because ChromaDB collection is empty. "
+                    f"Run embed_and_store_chunks first to populate the collection."
+                )
+            else:
+                logger.warning(
+                    f"BM25 index for {ticker_upper} exists in ChromaDB ({collection.count()} chunks) "
+                    f"but failed to rebuild. Available indices: {list(_bm25_indices.keys())}"
+                )
+        except Exception:
+            logger.warning(
+                f"BM25 index for {ticker_upper} has never been built; run embed_and_store_chunks first. "
+                f"Available indices: {list(_bm25_indices.keys())}"
+            )
+        return None
 
 
 def get_chroma_collection(ticker: str):
