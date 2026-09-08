@@ -1,0 +1,24 @@
+# Architecture docs (local reference only)
+ARCHITECTURE/
+
+# Environment and secrets
+.env
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Runtime data
+TempusRAG/chroma_store/
+TempusRAG/logs/
+TempusRAG/data/filings/
+
+# IDE
+.idea/
+.vscode/
+*.swp
