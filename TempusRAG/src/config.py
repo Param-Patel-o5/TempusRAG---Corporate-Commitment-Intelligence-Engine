@@ -206,11 +206,35 @@ JUDGE_MODEL = "groq/compound"
 Updated to use groq/compound (Groq's router model) instead of decommissioned llama-3.1-70b-versatile."""
 
 # ============================================================================
-# RATE LIMITING
+# RATE LIMITING AND RETRY CONFIG
 # ============================================================================
 
 SEC_MIN_REQUEST_INTERVAL = 0.11
 """Minimum seconds between SEC EDGAR requests (stay well under 10 req/sec limit)."""
+
+# Gemini API rate limiting (for promise extraction)
+GEMINI_REQUESTS_PER_MINUTE = 15
+"""Maximum requests per minute for Gemini API to avoid 429 errors."""
+
+GEMINI_REQUEST_INTERVAL = 60.0 / GEMINI_REQUESTS_PER_MINUTE
+"""Minimum seconds between Gemini API calls."""
+
+# Groq API rate limiting (for promise judging) - more conservative after testing
+GROQ_REQUESTS_PER_MINUTE = 10
+"""Maximum requests per minute for Groq API to avoid 429 errors (reduced after testing)."""
+
+GROQ_REQUEST_INTERVAL = 60.0 / GROQ_REQUESTS_PER_MINUTE
+"""Minimum seconds between Groq API calls (6 seconds)."""
+
+# Retry configuration for both APIs
+MAX_RETRIES = 3
+"""Maximum number of retries for failed API calls."""
+
+RETRY_BASE_DELAY = 1.0
+"""Base delay in seconds for exponential backoff retry."""
+
+RETRY_MAX_DELAY = 60.0
+"""Maximum delay in seconds for exponential backoff retry."""
 
 # ============================================================================
 # VALIDATION AT IMPORT TIME

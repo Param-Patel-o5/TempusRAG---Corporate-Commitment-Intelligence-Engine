@@ -3,20 +3,51 @@
 This is LLM Call 2 in the TempusRAG architecture. Takes extracted promises from extractor.py
 and searches for evidence of delivery across subsequent years, then judges each promise as 
 Delivered/Partial/Silently Abandoned/Pending using async batched calls to Groq.
+
+Rate limiting: Implements exponential backoff retry logic to handle 429 rate limit errors.
 """
 
 import asyncio
 import json
 import logging
 import time
+import random
 
 import groq
 
-from src.config import GROQ_API_KEY, JUDGE_MODEL, JUDGE_ANCHORS
+from src.config import (
+    GROQ_API_KEY, JUDGE_MODEL, JUDGE_ANCHORS,
+    GROQ_REQUEST_INTERVAL, MAX_RETRIES, RETRY_BASE_DELAY, RETRY_MAX_DELAY
+)
 from src.models import Promise, DeliveryEvidence, Chunk
 from src.retriever import hybrid_retrieve
 
 logger = logging.getLogger(__name__)
+
+# Track last request time for rate limiting (thread-safe with asyncio)
+_last_groq_request_time = 0.0
+_groq_lock = asyncio.Lock()
+
+async def _enforce_rate_limit_async():
+    """Enforce rate limiting between Groq API calls (async-safe)."""
+    global _last_groq_request_time
+    async with _groq_lock:
+        current_time = time.time()
+        time_since_last = current_time - _last_groq_request_time
+        
+        if time_since_last < GROQ_REQUEST_INTERVAL:
+            sleep_time = GROQ_REQUEST_INTERVAL - time_since_last
+            logger.debug(f"Rate limiting: sleeping {sleep_time:.2f}s")
+            await asyncio.sleep(sleep_time)
+        
+        _last_groq_request_time = time.time()
+
+def _exponential_backoff_delay(attempt: int) -> float:
+    """Calculate exponential backoff delay with jitter."""
+    delay = min(RETRY_BASE_DELAY * (2 ** attempt), RETRY_MAX_DELAY)
+    # Add jitter to prevent thundering herd
+    jitter = random.uniform(0.1, 0.3) * delay
+    return delay + jitter
 
 
 def search_evidence_for_promise(promise: Promise, ticker: str, evidence_search_years: list[int]) -> list[Chunk]:
@@ -103,9 +134,9 @@ RESPONSE FORMAT: Respond with ONLY a JSON object, no markdown fences:
     return prompt
 
 
-def _call_groq_judge(prompt: str, api_key: str) -> str:
+async def _call_groq_judge(prompt: str, api_key: str) -> str:
     """
-    Low-level call to Groq Llama model.
+    Low-level call to Groq Llama model with rate limiting and retry logic.
     
     Args:
         prompt: Judge prompt to send
@@ -115,18 +146,50 @@ def _call_groq_judge(prompt: str, api_key: str) -> str:
         str: Raw response text from Groq
         
     Raises:
-        Any network or API exceptions (propagated to caller)
+        Exception: If all retries are exhausted or non-recoverable error occurs.
     """
     client = groq.Groq(api_key=api_key)
     
-    response = client.chat.completions.create(
-        model=JUDGE_MODEL,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.1,  # Low temperature for consistent judging
-        max_tokens=1000
-    )
-    
-    return response.choices[0].message.content
+    for attempt in range(MAX_RETRIES + 1):  # 0-based attempts, so +1 for total tries
+        try:
+            # Enforce rate limiting before making request
+            await _enforce_rate_limit_async()
+            
+            # Make the API call
+            response = client.chat.completions.create(
+                model=JUDGE_MODEL,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.1,  # Low temperature for consistent judging
+                max_tokens=1000
+            )
+            
+            return response.choices[0].message.content
+            
+        except Exception as e:
+            error_str = str(e).lower()
+            
+            # Check if this is a rate limit error (429 or quota exceeded)
+            is_rate_limit = ('429' in error_str or 
+                           'rate limit' in error_str or 
+                           'quota exceeded' in error_str or
+                           'too many requests' in error_str)
+            
+            if is_rate_limit and attempt < MAX_RETRIES:
+                # Exponential backoff for rate limit errors
+                delay = _exponential_backoff_delay(attempt)
+                logger.warning(f"Rate limit hit on attempt {attempt + 1}/{MAX_RETRIES + 1}, retrying in {delay:.2f}s: {e}")
+                await asyncio.sleep(delay)
+                continue
+            elif attempt < MAX_RETRIES:
+                # For other errors, shorter delay
+                delay = RETRY_BASE_DELAY * (attempt + 1)
+                logger.warning(f"API error on attempt {attempt + 1}/{MAX_RETRIES + 1}, retrying in {delay:.2f}s: {e}")
+                await asyncio.sleep(delay)
+                continue
+            else:
+                # All retries exhausted
+                logger.error(f"All {MAX_RETRIES + 1} attempts failed for Groq API call: {e}")
+                raise
 
 
 def _parse_judge_json(raw_text: str) -> dict:
@@ -168,9 +231,9 @@ def _parse_judge_json(raw_text: str) -> dict:
     return result
 
 
-def judge_single_promise(promise: Promise, evidence_chunks: list[Chunk], api_key: str | None = None) -> DeliveryEvidence:
+async def judge_single_promise_async(promise: Promise, evidence_chunks: list[Chunk], api_key: str | None = None) -> DeliveryEvidence:
     """
-    Judge a single promise using Groq Llama model.
+    Judge a single promise using Groq Llama model (async version).
     
     Args:
         promise: Promise to judge
@@ -192,7 +255,7 @@ def judge_single_promise(promise: Promise, evidence_chunks: list[Chunk], api_key
     
     # First attempt
     try:
-        raw_response = _call_groq_judge(prompt, resolved_api_key)
+        raw_response = await _call_groq_judge(prompt, resolved_api_key)
         judge_result = _parse_judge_json(raw_response)
         
     except (json.JSONDecodeError, ValueError) as e:
@@ -202,7 +265,7 @@ def judge_single_promise(promise: Promise, evidence_chunks: list[Chunk], api_key
         retry_prompt = prompt + "\n\nYour previous response was not valid JSON. Respond with ONLY the JSON object, nothing else."
         
         try:
-            raw_response = _call_groq_judge(retry_prompt, resolved_api_key)
+            raw_response = await _call_groq_judge(retry_prompt, resolved_api_key)
             judge_result = _parse_judge_json(raw_response)
             logger.info(f"Judge retry successful for promise: {promise.promise_text[:50]}...")
             
@@ -247,10 +310,24 @@ def judge_single_promise(promise: Promise, evidence_chunks: list[Chunk], api_key
             judge_reasoning=f"Failed to construct result: {e}"
         )
 
+def judge_single_promise(promise: Promise, evidence_chunks: list[Chunk], api_key: str | None = None) -> DeliveryEvidence:
+    """
+    Judge a single promise using Groq Llama model (sync wrapper).
+    
+    Args:
+        promise: Promise to judge
+        evidence_chunks: Evidence chunks from subsequent years
+        api_key: Optional API key override (uses config if None)
+        
+    Returns:
+        DeliveryEvidence: Judgment result with score, status, and reasoning
+    """
+    return asyncio.run(judge_single_promise_async(promise, evidence_chunks, api_key))
+
 
 async def _judge_batch(batch_with_evidence: list[tuple[Promise, list[Chunk]]], api_key: str) -> list[DeliveryEvidence]:
     """
-    Helper to judge a batch of promises concurrently.
+    Helper to judge a batch of promises concurrently with rate limiting.
     
     Args:
         batch_with_evidence: List of (promise, evidence_chunks) tuples
@@ -260,7 +337,7 @@ async def _judge_batch(batch_with_evidence: list[tuple[Promise, list[Chunk]]], a
         list[DeliveryEvidence]: Results for the batch (may include exceptions)
     """
     tasks = [
-        asyncio.to_thread(judge_single_promise, promise, evidence, api_key)
+        judge_single_promise_async(promise, evidence, api_key)
         for promise, evidence in batch_with_evidence
     ]
     
@@ -290,16 +367,16 @@ async def _judge_batch(batch_with_evidence: list[tuple[Promise, list[Chunk]]], a
 
 
 def batch_judge_promises(promises: list[Promise], ticker: str, evidence_search_years: list[int], 
-                        api_key: str | None = None, batch_size: int = 8) -> list[DeliveryEvidence]:
+                        api_key: str | None = None, batch_size: int = 1) -> list[DeliveryEvidence]:
     """
-    Judge multiple promises in batches using async calls to Groq.
+    Judge multiple promises in batches using async calls to Groq with conservative rate limiting.
     
     Args:
         promises: List of promises to judge
         ticker: Company ticker for evidence search
         evidence_search_years: Years to search for evidence
         api_key: Optional API key override
-        batch_size: Number of promises per concurrent batch
+        batch_size: Number of promises per concurrent batch (1 = sequential for max safety)
         
     Returns:
         list[DeliveryEvidence]: Delivery evidence for all promises in input order

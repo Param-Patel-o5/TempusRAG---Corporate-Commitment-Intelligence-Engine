@@ -6,17 +6,48 @@ sections (MD&A, Future Outlook, Growth Strategy) and extracts structured Promise
 API Key handling: This module reads GEMINI_API_KEY from config.py at call time, not import time.
 The Streamlit UI may set API keys at runtime, so extract_promises_for_year() accepts an optional
 api_key parameter that overrides the config value if provided.
+
+Rate limiting: Implements exponential backoff retry logic to handle 429 rate limit errors.
 """
 
 import json
 import logging
+import time
+import random
 
 import google.generativeai as genai
+from google.generativeai.types.generation_types import BlockedPromptException
 
-from src.config import GEMINI_API_KEY, EXTRACTOR_MODEL, PROMISE_EXTRACTION_SECTIONS
+from src.config import (
+    GEMINI_API_KEY, EXTRACTOR_MODEL, PROMISE_EXTRACTION_SECTIONS,
+    GEMINI_REQUEST_INTERVAL, MAX_RETRIES, RETRY_BASE_DELAY, RETRY_MAX_DELAY
+)
 from src.models import Promise
 
 logger = logging.getLogger(__name__)
+
+# Track last request time for rate limiting
+_last_gemini_request_time = 0.0
+
+def _enforce_rate_limit():
+    """Enforce rate limiting between Gemini API calls."""
+    global _last_gemini_request_time
+    current_time = time.time()
+    time_since_last = current_time - _last_gemini_request_time
+    
+    if time_since_last < GEMINI_REQUEST_INTERVAL:
+        sleep_time = GEMINI_REQUEST_INTERVAL - time_since_last
+        logger.debug(f"Rate limiting: sleeping {sleep_time:.2f}s")
+        time.sleep(sleep_time)
+    
+    _last_gemini_request_time = time.time()
+
+def _exponential_backoff_delay(attempt: int) -> float:
+    """Calculate exponential backoff delay with jitter."""
+    delay = min(RETRY_BASE_DELAY * (2 ** attempt), RETRY_MAX_DELAY)
+    # Add jitter to prevent thundering herd
+    jitter = random.uniform(0.1, 0.3) * delay
+    return delay + jitter
 
 # Configure Gemini client at module level if API key is available
 if GEMINI_API_KEY:
@@ -111,7 +142,7 @@ CONTENT TO ANALYZE:
 
 def _call_gemini(prompt: str, api_key: str) -> str:
     """
-    Low-level Gemini API call.
+    Low-level Gemini API call with rate limiting and retry logic.
     
     Args:
         prompt: The prompt to send to Gemini.
@@ -121,16 +152,52 @@ def _call_gemini(prompt: str, api_key: str) -> str:
         str: Raw response text from Gemini.
         
     Raises:
-        Any network or API exceptions (propagated to caller for retry logic).
+        Exception: If all retries are exhausted or non-recoverable error occurs.
     """
     # Reconfigure client with the provided API key (supports per-user keys from Streamlit)
     genai.configure(api_key=api_key)
-    
-    # Create model and generate content
     model = genai.GenerativeModel(EXTRACTOR_MODEL)
-    response = model.generate_content(prompt)
     
-    return response.text
+    for attempt in range(MAX_RETRIES + 1):  # 0-based attempts, so +1 for total tries
+        try:
+            # Enforce rate limiting before making request
+            _enforce_rate_limit()
+            
+            # Make the API call
+            response = model.generate_content(prompt)
+            
+            # Check if response was blocked
+            if hasattr(response, 'prompt_feedback') and response.prompt_feedback:
+                if hasattr(response.prompt_feedback, 'block_reason'):
+                    raise BlockedPromptException(f"Prompt blocked: {response.prompt_feedback.block_reason}")
+            
+            return response.text
+            
+        except Exception as e:
+            error_str = str(e).lower()
+            
+            # Check if this is a rate limit error (429 or quota exceeded)
+            is_rate_limit = ('429' in error_str or 
+                           'rate limit' in error_str or 
+                           'quota exceeded' in error_str or
+                           'too many requests' in error_str)
+            
+            if is_rate_limit and attempt < MAX_RETRIES:
+                # Exponential backoff for rate limit errors
+                delay = _exponential_backoff_delay(attempt)
+                logger.warning(f"Rate limit hit on attempt {attempt + 1}/{MAX_RETRIES + 1}, retrying in {delay:.2f}s: {e}")
+                time.sleep(delay)
+                continue
+            elif attempt < MAX_RETRIES:
+                # For other errors, shorter delay
+                delay = RETRY_BASE_DELAY * (attempt + 1)
+                logger.warning(f"API error on attempt {attempt + 1}/{MAX_RETRIES + 1}, retrying in {delay:.2f}s: {e}")
+                time.sleep(delay)
+                continue
+            else:
+                # All retries exhausted
+                logger.error(f"All {MAX_RETRIES + 1} attempts failed for Gemini API call: {e}")
+                raise
 
 
 def _parse_promise_json(raw_text: str) -> list[dict]:
