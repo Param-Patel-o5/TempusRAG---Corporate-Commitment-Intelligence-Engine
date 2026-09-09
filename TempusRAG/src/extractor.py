@@ -31,34 +31,36 @@ else:
 
 def filter_promise_chunks(chunks_by_year: dict[int, list], sections: list[str] = PROMISE_EXTRACTION_SECTIONS) -> dict[int, list]:
     """
-    Filter chunks to only include promise-extraction-relevant sections.
+    Filter chunks to only those in promise-extraction sections (case-insensitive substring match).
     
     Args:
-        chunks_by_year: Dictionary mapping year to list of Chunk objects.
-        sections: List of section names to include (defaults to PROMISE_EXTRACTION_SECTIONS).
+        chunks_by_year: Dictionary mapping year to list of chunks
+        sections: List of keyword patterns to match against section names
         
     Returns:
-        dict[int, list]: Same structure as input, but with chunks filtered to only relevant sections.
+        dict[int, list]: Filtered chunks from matching sections
     """
-    filtered_chunks = {}
-    
+    filtered = {}
     for year, chunks in chunks_by_year.items():
-        filtered_chunks[year] = [
-            chunk for chunk in chunks 
-            if chunk.section in sections
+        filtered[year] = [
+            c for c in chunks 
+            if any(keyword.lower() in c.section.lower() for keyword in sections)
         ]
         
-        logger.debug(
-            f"Year {year}: filtered {len(chunks)} chunks down to {len(filtered_chunks[year])} "
-            f"promise-extraction chunks (sections: {sections})"
+        logger.info(
+            f"Year {year}: filtered {len(chunks)} chunks down to {len(filtered[year])} "
+            f"promise-extraction chunks"
         )
     
-    return filtered_chunks
+    return filtered
 
 
 def build_extraction_prompt(year: int, chunks: list) -> str:
     """
     Build prompt for extracting forward-looking commitments from chunks.
+    
+    Updated to be more robust and capture both explicit promises and strategic intentions
+    across different companies' communication styles (direct vs. cautious language).
     
     Args:
         year: Fiscal year context for the extraction.
@@ -74,21 +76,32 @@ def build_extraction_prompt(year: int, chunks: list) -> str:
     
     combined_text = "\n\n".join(chunk_texts)
     
-    prompt = f"""You are analyzing SEC filing content from fiscal year {year} to extract forward-looking management commitments and promises.
+    prompt = f"""You are analyzing SEC filing content from fiscal year {year} to extract forward-looking statements, commitments, strategic plans, and management intentions.
 
-TASK: Extract every distinct forward-looking commitment, promise, or target mentioned by management in the following text. Focus on specific, measurable commitments about future performance, initiatives, or goals.
+TASK: Extract any forward-looking statement that indicates management's intentions, plans, expectations, or commitments about future business activities. This includes:
+
+• Strategic plans and business initiatives
+• Technology investments or development plans
+• Growth, expansion, or market plans
+• Operational improvements or changes
+• Financial targets, guidance, or expectations
+• Commitments to stakeholders (employees, customers, shareholders)
+• Business model changes or adaptations
+• Regulatory compliance or adaptation plans
+
+IMPORTANT: Include statements even with cautious language like "may", "could", "intend to", "plan to", "expect to", "committed to", "will continue", "are working to", etc. These indicate management intentions and strategic direction.
 
 INSTRUCTIONS:
-1. Extract each forward-looking commitment as a separate promise
+1. Extract each distinct forward-looking statement as a separate promise
 2. For each promise, determine the domain (must be exactly one of: Technology, Claims, Growth, Finance, Operations)
 3. If a specific deadline is mentioned in the text, capture it verbatim; otherwise use null
 4. The year_made is {year} (the fiscal year of this filing)
 5. Set page_number to 0 (page numbers are not available from chunk text)
 
 RESPONSE FORMAT: Respond with ONLY a JSON array matching this exact structure, no markdown fences, no preamble:
-[{{"promise_text": "exact text of the commitment", "domain": "Technology|Claims|Growth|Finance|Operations", "deadline_mentioned": "exact deadline text or null", "year_made": {year}, "page_number": 0}}]
+[{{"promise_text": "exact text of the commitment or strategic statement", "domain": "Technology|Claims|Growth|Finance|Operations", "deadline_mentioned": "exact deadline text or null", "year_made": {year}, "page_number": 0}}]
 
-If no forward-looking commitments are found, respond with an empty array: []
+If no forward-looking statements are found, respond with an empty array: []
 
 CONTENT TO ANALYZE:
 {combined_text}"""
@@ -211,7 +224,7 @@ def extract_promises_for_year(year: int, chunks: list, api_key: str | None = Non
             # Force year_made to the known year parameter (ground truth)
             item["year_made"] = year
             
-            # Create Promise object
+            # Create Promise object (confidence_score is optional, computed later by scorer.py)
             promise = Promise(**item)
             promises.append(promise)
             
@@ -226,7 +239,7 @@ def extract_promises_for_year(year: int, chunks: list, api_key: str | None = Non
 
 def extract_all_promises(chunks_by_year: dict[int, list], api_key: str | None = None) -> dict[int, list[Promise]]:
     """
-    Extract promises from all years of chunks.
+    Extract promises from all years of chunks using simple section filtering.
     
     Args:
         chunks_by_year: Dictionary mapping year to list of Chunk objects.
@@ -237,7 +250,7 @@ def extract_all_promises(chunks_by_year: dict[int, list], api_key: str | None = 
     """
     logger.info(f"Starting promise extraction for {len(chunks_by_year)} years")
     
-    # Filter chunks to promise-extraction sections only
+    # Filter chunks by hardcoded section patterns
     filtered_chunks = filter_promise_chunks(chunks_by_year)
     
     # Extract promises for each year

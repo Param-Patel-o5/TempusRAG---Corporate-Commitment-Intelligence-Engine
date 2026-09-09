@@ -121,8 +121,16 @@ Similarity < this threshold → absent, candidate for Silently Abandoned.
 # SECTION ROLES (where promises are extracted vs where evidence is searched)
 # ============================================================================
 
-PROMISE_EXTRACTION_SECTIONS = ["MD&A", "Future Outlook", "Growth Strategy"]
-"""Sections where promises are initially extracted (LLM Call 1, Gemini)."""
+PROMISE_EXTRACTION_SECTIONS = [
+    "MD&A", 
+    "management", 
+    "discussion", 
+    "outlook", 
+    "future", 
+    "growth", 
+    "strategy"
+]
+"""Keyword patterns for substring matching in section names (case-insensitive)."""
 
 EVIDENCE_SEARCH_SECTIONS = ["MD&A", "Financial Results", "Claims Operations"]
 """Sections searched for evidence of promise fulfillment (LLM Call 2, Groq)."""
@@ -190,11 +198,12 @@ Embedded directly into judge prompts to ground delivery_score (0-100).
 # LLM MODEL IDENTIFIERS
 # ============================================================================
 
-EXTRACTOR_MODEL = "gemini-1.5-flash"
+EXTRACTOR_MODEL = "gemini-3.6-flash"
 """Google Generative AI model for LLM Call 1 (promise extraction)."""
 
-JUDGE_MODEL = "llama-3.1-70b-versatile"
-"""Groq model identifier for LLM Call 2 (cross-year reasoning + scoring)."""
+JUDGE_MODEL = "groq/compound"
+"""Groq model identifier for LLM Call 2 (cross-year reasoning + scoring).
+Updated to use groq/compound (Groq's router model) instead of decommissioned llama-3.1-70b-versatile."""
 
 # ============================================================================
 # RATE LIMITING

@@ -14,7 +14,7 @@ class Promise(BaseModel):
     deadline_mentioned: str | None
     year_made: int
     page_number: int
-    confidence_score: float = Field(ge=0.0, le=1.0)
+    confidence_score: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
 class DeliveryEvidence(BaseModel):
