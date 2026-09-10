@@ -1,954 +1,758 @@
-#!/usr/bin/env python3
-"""
-TempusRAG Streamlit Web Application
+"""TempusRAG dashboard — corporate commitment intelligence over SEC 10-Ks."""
 
-A comprehensive web interface for analyzing corporate credibility through 
-SEC filings analysis. Features promise extraction, cross-year reasoning,
-and natural language querying capabilities.
-"""
+from __future__ import annotations
 
+import logging
 import re
 import time
-import logging
-from typing import Optional, Tuple, List, Dict, Any
+from typing import Any
 
 import streamlit as st
 
-# TempusRAG imports
-from src.pipeline import run_tempusrag_pipeline
-from src.query import process_query
-from src.models import CompanyCredibilityReport
 from src.config import GEMINI_API_KEY, GROQ_API_KEY
+from src.ingestion import load_company_directory
+from src.models import CompanyCredibilityReport, DeliveryEvidence
+from src.pipeline import get_last_artifacts, run_tempusrag_pipeline
+from src.query import process_query
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Page configuration
 st.set_page_config(
-    page_title="TempusRAG - Corporate Credibility Analysis",
-    page_icon="📊",
+    page_title="TempusRAG",
+    page_icon="■",
     layout="wide",
-    initial_sidebar_state="expanded",
-    menu_items={
-        'Get Help': None,
-        'Report a bug': None,
-        'About': "TempusRAG analyzes corporate credibility through SEC filings"
-    }
+    initial_sidebar_state="collapsed",
 )
 
+STATUS_ORDER = ("Delivered", "Partial", "Silently Abandoned", "Pending")
+
+
 def init_session_state() -> None:
-    """Initialize all session state variables with defaults."""
-    defaults = {
-        'ticker': '',
-        'report': None,
-        'conversation': [],
-        'gemini_override_key': '',
-        'groq_override_key': '',
-        'use_custom_gemini': False,
-        'use_custom_groq': False,
-        'analysis_running': False,
-        'last_analysis_time': None,
-        'show_api_form': False
+    defaults: dict[str, Any] = {
+        "ticker": "HIG",
+        "company_name": "The Hartford",
+        "issuer_query": "HIG",
+        "report": None,
+        "evidence": [],
+        "conversation": [],
+        "gemini_override_key": "",
+        "groq_override_key": "",
+        "use_custom_gemini": False,
+        "use_custom_groq": False,
+        "analysis_running": False,
+        "selected_row": 0,
+        "status_filter": "All",
+        "elapsed_seconds": None,
     }
-    
     for key, value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
 
-def render_custom_css() -> None:
-    """Inject custom CSS for glass morphism and modern styling."""
-    st.markdown("""
-    <style>
-    /* Global theme overrides */
-    .stApp {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    /* Glass morphism cards */
-    .glass-card {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 24px;
-        margin: 16px 0;
-        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-    }
-    
-    /* Hero score display */
-    .hero-score {
-        font-size: 72px;
-        font-weight: bold;
-        background: linear-gradient(45deg, #00d4aa, #8a2be2);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-align: center;
-        margin: 0;
-        line-height: 1.2;
-    }
-    
-    /* Gradient buttons */
-    .gradient-button {
-        background: linear-gradient(45deg, #00d4aa, #00a8cc);
-        border: none;
-        border-radius: 8px;
-        color: white;
-        padding: 12px 24px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    
-    .gradient-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 212, 170, 0.4);
-    }
-    
-    /* Status badges */
-    .status-delivered {
-        background: #10b981;
-        color: white;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-    
-    .status-partial {
-        background: #f59e0b;
-        color: white;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-    
-    .status-abandoned {
-        background: #ef4444;
-        color: white;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-    
-    /* Domain badges */
-    .domain-technology {
-        background: #3b82f6;
-        color: white;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 11px;
-        font-weight: 500;
-    }
-    
-    .domain-claims {
-        background: #8b5cf6;
-        color: white;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 11px;
-        font-weight: 500;
-    }
-    
-    .domain-growth {
-        background: #10b981;
-        color: white;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 11px;
-        font-weight: 500;
-    }
-    
-    .domain-finance {
-        background: #f59e0b;
-        color: white;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 11px;
-        font-weight: 500;
-    }
-    
-    .domain-operations {
-        background: #6b7280;
-        color: white;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 11px;
-        font-weight: 500;
-    }
-    
-    /* Chat styling */
-    .chat-message {
-        padding: 12px;
-        margin: 8px 0;
-        border-radius: 12px;
-        max-width: 85%;
-    }
-    
-    .chat-user {
-        background: linear-gradient(45deg, #00d4aa, #00a8cc);
-        color: white;
-        margin-left: auto;
-        text-align: right;
-    }
-    
-    .chat-assistant {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(5px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: white;
-    }
-    
-    /* Progress bar styling */
-    .domain-progress {
-        height: 8px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 4px;
-        overflow: hidden;
-        margin: 4px 0;
-    }
-    
-    .domain-progress-fill {
-        height: 100%;
-        background: linear-gradient(45deg, #00d4aa, #8a2be2);
-        border-radius: 4px;
-        transition: width 0.3s ease;
-    }
-    
-    /* Red flag styling */
-    .red-flag {
-        background: rgba(239, 68, 68, 0.1);
-        border-left: 4px solid #ef4444;
-        padding: 12px;
-        margin: 8px 0;
-        border-radius: 4px;
-        color: #fecaca;
-    }
-    
-    /* Metric cards */
-    .metric-card {
-        text-align: center;
-        padding: 20px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    
-    .metric-number {
-        font-size: 36px;
-        font-weight: bold;
-        margin: 8px 0;
-    }
-    
-    .metric-label {
-        font-size: 14px;
-        opacity: 0.8;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-def render_header() -> None:
-    """Render the main application header with logo and navigation."""
-    st.markdown("""
-    <div style="text-align: center; padding: 2rem 0;">
-        <h1 style="font-size: 3rem; font-weight: bold; margin-bottom: 0.5rem; 
-                   background: linear-gradient(45deg, #00d4aa, #8a2be2);
-                   -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-            📊 TempusRAG
-        </h1>
-        <p style="font-size: 1.2rem; opacity: 0.8; margin-bottom: 2rem;">
-            Corporate Credibility Analysis through SEC Filings
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
 
-def render_sidebar_api_info() -> None:
-    """Display current API key configuration and status in sidebar."""
-    st.sidebar.markdown("### 🔑 API Configuration")
-    
+def inject_css() -> None:
+    st.markdown(
+        """
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+html, body, [class*="css"], [data-testid="stAppViewContainer"], .stMarkdown, p, label {
+    font-family: "Instrument Sans", "Segoe UI", sans-serif;
+}
+
+.stApp {
+    background: #26251F;
+    color: #F4F1EA;
+}
+
+#MainMenu, header[data-testid="stHeader"], footer, .stDeployButton {
+    visibility: hidden;
+    height: 0;
+}
+
+.block-container {
+    padding-top: 1.25rem;
+    padding-bottom: 2rem;
+    max-width: 1280px;
+}
+
+.tr-masthead {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid #4A463C;
+    padding-bottom: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+.tr-wordmark {
+    font-family: "Fraunces", "Times New Roman", serif;
+    font-optical-sizing: auto;
+    font-size: 1.55rem;
+    font-weight: 550;
+    letter-spacing: -0.02em;
+    color: #D97757;
+    margin: 0;
+    line-height: 1.1;
+}
+.tr-sub {
+    font-size: 0.88rem;
+    color: #B5AFA3;
+    margin: 0.35rem 0 0 0;
+}
+.tr-meta {
+    font-size: 0.75rem;
+    color: #B5AFA3;
+    text-align: right;
+}
+
+.tr-score-wrap {
+    border: 1px solid #4A463C;
+    background: #32302A;
+    padding: 1.35rem 1.5rem;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+}
+.tr-score-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #B5AFA3;
+}
+.tr-score {
+    font-family: "Fraunces", "Times New Roman", serif;
+    font-size: 3.4rem;
+    font-weight: 550;
+    line-height: 1;
+    color: #F4F1EA;
+    margin: 0.35rem 0 0.55rem 0;
+}
+.tr-score span {
+    font-family: "Instrument Sans", sans-serif;
+    font-size: 1rem;
+    color: #B5AFA3;
+}
+.tr-thesis {
+    font-size: 0.98rem;
+    line-height: 1.55;
+    color: #E4DFD4;
+    margin: 0;
+    max-width: 52rem;
+}
+
+.tr-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: #4A463C;
+    border: 1px solid #4A463C;
+    margin-bottom: 1.25rem;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.tr-kpi {
+    background: #32302A;
+    padding: 0.95rem 1rem;
+}
+.tr-kpi .n {
+    font-family: "Fraunces", serif;
+    font-size: 1.55rem;
+    color: #F4F1EA;
+}
+.tr-kpi .l {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #B5AFA3;
+    margin-top: 0.15rem;
+}
+
+.tr-flag {
+    border-left: 2px solid #D97757;
+    padding: 0.45rem 0.75rem;
+    color: #E4DFD4;
+    font-size: 0.88rem;
+    margin-bottom: 0.4rem;
+    background: #32302A;
+    border-radius: 0 6px 6px 0;
+}
+
+.tr-cite {
+    font-size: 0.75rem;
+    color: #B5AFA3;
+}
+
+.tr-picked {
+    font-size: 0.8rem;
+    color: #B5AFA3;
+    margin: 0.1rem 0 0.35rem 0;
+}
+.tr-picked strong {
+    color: #F4F1EA;
+    font-weight: 600;
+}
+
+.tr-stages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.55rem;
+    padding: 0.75rem 0.9rem;
+    background: #32302A;
+    border: 1px solid #4A463C;
+    border-radius: 10px;
+    margin: 0.5rem 0 0.75rem 0;
+}
+.tr-stage {
+    font-size: 0.78rem;
+    color: #7A756C;
+    letter-spacing: 0.04em;
+}
+.tr-stage.is-done {
+    color: #B5AFA3;
+}
+.tr-stage.is-active {
+    color: #D97757;
+    font-weight: 600;
+}
+
+div[data-testid="stSidebar"] {
+    background: #32302A;
+}
+
+.stButton > button[kind="primary"] {
+    background: #D97757;
+    color: #26251F;
+    border: none;
+    border-radius: 8px;
+    font-family: "Instrument Sans", sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+.stButton > button[kind="secondary"] {
+    background: transparent;
+    color: #F4F1EA;
+    border: 1px solid #4A463C;
+    border-radius: 8px;
+}
+
+[data-testid="stMetricValue"] {
+    font-family: "Fraunces", serif;
+}
+</style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+@st.cache_resource(show_spinner="Loading SEC issuer list…")
+def issuer_directory() -> list[dict[str, str]]:
+    return load_company_directory()
+
+
+def search_issuers(query: str, directory: list[dict[str, str]], limit: int = 8) -> list[dict[str, str]]:
+    q = (query or "").strip().lower()
+    if not q:
+        return []
+
+    exact_ticker: list[dict[str, str]] = []
+    ticker_prefix: list[dict[str, str]] = []
+    name_prefix: list[dict[str, str]] = []
+    name_contains: list[dict[str, str]] = []
+    ticker_contains: list[dict[str, str]] = []
+
+    for row in directory:
+        ticker = row["ticker"]
+        title = row["title"]
+        t_low = ticker.lower()
+        n_low = title.lower()
+        if t_low == q:
+            exact_ticker.append(row)
+        elif t_low.startswith(q):
+            ticker_prefix.append(row)
+        elif n_low.startswith(q):
+            name_prefix.append(row)
+        elif q in n_low:
+            name_contains.append(row)
+        elif q in t_low:
+            ticker_contains.append(row)
+
+    ranked = exact_ticker + ticker_prefix + name_prefix + name_contains + ticker_contains
+    seen: set[str] = set()
+    unique: list[dict[str, str]] = []
+    for row in ranked:
+        if row["ticker"] in seen:
+            continue
+        seen.add(row["ticker"])
+        unique.append(row)
+        if len(unique) >= limit:
+            break
+    return unique
+
+
+def resolve_issuer(query: str, directory: list[dict[str, str]]) -> dict[str, str] | None:
+    matches = search_issuers(query, directory, limit=8)
+    if not matches:
+        return None
+    q = (query or "").strip().upper()
+    for row in matches:
+        if row["ticker"] == q:
+            return row
+    return matches[0]
+
+
+def get_active_api_keys() -> tuple[str, str]:
+    gemini = (
+        st.session_state.gemini_override_key
+        if st.session_state.use_custom_gemini and st.session_state.gemini_override_key
+        else GEMINI_API_KEY
+    )
+    groq = (
+        st.session_state.groq_override_key
+        if st.session_state.use_custom_groq and st.session_state.groq_override_key
+        else GROQ_API_KEY
+    )
+    return gemini or "", groq or ""
+
+
+def key_label(present: bool, custom: bool) -> str:
+    if not present:
+        return "missing"
+    return "session" if custom else "configured"
+
+
+def render_sidebar() -> None:
+    st.sidebar.markdown("**Credentials**")
+    st.sidebar.caption("Keys stay in this browser session. They are not written to disk.")
+
     gemini_key, groq_key = get_active_api_keys()
-    
-    # Gemini status
-    if gemini_key:
-        if st.session_state.get('use_custom_gemini'):
-            st.sidebar.success("✅ Gemini: Custom key")
-        else:
-            st.sidebar.success("✅ Gemini: App key")
-    else:
-        st.sidebar.error("❌ Gemini: No key")
-    
-    # Groq status  
-    if groq_key:
-        if st.session_state.get('use_custom_groq'):
-            st.sidebar.success("✅ Groq: Custom key")
-        else:
-            st.sidebar.success("✅ Groq: App key")
-    else:
-        st.sidebar.error("❌ Groq: No key")
-    
-    # API key override form
-    if st.sidebar.button("⚙️ Use my own API keys", type="secondary"):
-        st.session_state.show_api_form = not st.session_state.show_api_form
-    
-    if st.session_state.show_api_form:
-        render_api_key_form()
+    st.sidebar.text(
+        f"Gemini  {key_label(bool(gemini_key), st.session_state.use_custom_gemini)}\n"
+        f"Groq    {key_label(bool(groq_key), st.session_state.use_custom_groq)}"
+    )
 
-def render_api_key_form() -> None:
-    """Render the API key override form in sidebar."""
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("#### Custom API Keys")
-    st.sidebar.markdown("*Keys are session-only, not stored*")
-    
-    # Gemini key form
-    col1, col2 = st.sidebar.columns([3, 1])
-    with col1:
-        use_gemini = st.checkbox("Use Gemini key", value=st.session_state.use_custom_gemini)
-    with col2:
-        if use_gemini:
-            st.session_state.use_custom_gemini = True
-    
-    if use_gemini:
-        gemini_key = st.sidebar.text_input(
-            "Gemini API Key",
+    st.session_state.use_custom_gemini = st.sidebar.checkbox(
+        "Override Gemini key", value=st.session_state.use_custom_gemini
+    )
+    if st.session_state.use_custom_gemini:
+        st.session_state.gemini_override_key = st.sidebar.text_input(
+            "Gemini API key",
             type="password",
             value=st.session_state.gemini_override_key,
-            help="Get from https://aistudio.google.com/app/apikey"
         )
-        if gemini_key != st.session_state.gemini_override_key:
-            st.session_state.gemini_override_key = gemini_key
-    else:
-        st.session_state.use_custom_gemini = False
-        st.session_state.gemini_override_key = ""
-    
-    # Groq key form
-    col1, col2 = st.sidebar.columns([3, 1])
-    with col1:
-        use_groq = st.checkbox("Use Groq key", value=st.session_state.use_custom_groq)
-    with col2:
-        if use_groq:
-            st.session_state.use_custom_groq = True
-    
-    if use_groq:
-        groq_key = st.sidebar.text_input(
-            "Groq API Key",
-            type="password", 
+
+    st.session_state.use_custom_groq = st.sidebar.checkbox(
+        "Override Groq key", value=st.session_state.use_custom_groq
+    )
+    if st.session_state.use_custom_groq:
+        st.session_state.groq_override_key = st.sidebar.text_input(
+            "Groq API key",
+            type="password",
             value=st.session_state.groq_override_key,
-            help="Get from https://console.groq.com/keys"
         )
-        if groq_key != st.session_state.groq_override_key:
-            st.session_state.groq_override_key = groq_key
-    else:
-        st.session_state.use_custom_groq = False
-        st.session_state.groq_override_key = ""
 
-def render_sidebar_requirements() -> None:
-    """Display API requirements and setup instructions."""
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### 📋 Requirements")
-    st.sidebar.markdown("""
-    **Required APIs:**
-    - **Gemini**: Promise extraction from SEC filings
-    - **Groq**: Cross-year reasoning and judgment
-    
-    **Setup Options:**
-    1. Use app's built-in keys (limited usage)
-    2. Provide your own keys above (unlimited)
-    
-    **Getting API Keys:**
-    - [Gemini API Key](https://aistudio.google.com/app/apikey) (Free tier: 20 requests/day)
-    - [Groq API Key](https://console.groq.com/keys) (Free tier: 70K tokens/minute)
-    """)
+    st.sidebar.divider()
+    st.sidebar.caption(
+        "Extraction uses Gemini. Cross-year judgment uses Groq. "
+        "Free tiers are rate-limited; cached filings skip a full re-ingest."
+    )
 
-def get_active_api_keys() -> Tuple[str, str]:
-    """
-    Returns (gemini_key, groq_key) based on current configuration.
-    Prioritizes custom user keys over app configuration.
-    """
-    # Determine Gemini key
-    if st.session_state.get('use_custom_gemini') and st.session_state.get('gemini_override_key'):
-        gemini_key = st.session_state.gemini_override_key
-        logger.debug("Using custom Gemini key")
-    else:
-        gemini_key = GEMINI_API_KEY
-        logger.debug("Using app Gemini key")
-    
-    # Determine Groq key  
-    if st.session_state.get('use_custom_groq') and st.session_state.get('groq_override_key'):
-        groq_key = st.session_state.groq_override_key
-        logger.debug("Using custom Groq key")
-    else:
-        groq_key = GROQ_API_KEY
-        logger.debug("Using app Groq key")
-    
-    return gemini_key, groq_key
 
-def render_hero_card(report: CompanyCredibilityReport) -> None:
-    """Render the main hero card with credibility score and summary."""
-    delivered_percent = (report.delivered / report.total_promises * 100) if report.total_promises > 0 else 0
-    
-    st.markdown(f"""
-    <div class="glass-card">
-        <div class="hero-score">{report.overall_score:.0f}</div>
-        <p style="text-align: center; font-size: 1.2rem; margin-top: 1rem; opacity: 0.9;">
-            <strong>{report.company}</strong> has delivered on <strong>{report.delivered}</strong> of 
-            <strong>{report.total_promises}</strong> forward-looking promises across 
-            <strong>{len(report.years_analyzed)}</strong> fiscal years.
-            Overall delivery rate: <strong>{delivered_percent:.1f}%</strong>. 
-            <strong>{len(report.red_flags)}</strong> red flag(s) detected.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+PIPELINE_STAGES = ("Validate", "Ingest", "Chunk", "Embed", "Extract", "Judge", "Score", "Done")
 
-def render_ticker_input() -> None:
-    """Render the ticker input section with validation and analysis trigger."""
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    
-    col1, col2 = st.columns([3, 1])
-    
-    with col1:
-        ticker = st.text_input(
-            "Enter company ticker",
-            value=st.session_state.ticker,
-            placeholder="e.g., HIG, NVDA, AAPL...",
-            help="Enter a valid stock ticker symbol",
-            key="ticker_input"
+
+def stages_html(current: str) -> str:
+    reached = True
+    parts = ['<div class="tr-stages">']
+    for name in PIPELINE_STAGES:
+        cls = "tr-stage"
+        if name == current:
+            cls += " is-active"
+            reached = False
+        elif reached:
+            cls += " is-done"
+        parts.append(f'<span class="{cls}">{name}</span>')
+    parts.append("</div>")
+    return "".join(parts)
+
+
+def classify_error(exc: Exception) -> str:
+    msg = str(exc).lower()
+    if "429" in msg or "rate limit" in msg or "quota" in msg:
+        return (
+            "Provider rate limit reached. Wait and retry, or paste your own keys "
+            "in the sidebar. Cached filings are reused when available."
         )
-        if ticker != st.session_state.ticker:
-            st.session_state.ticker = ticker.upper()
-    
-    with col2:
-        st.markdown("<br>", unsafe_allow_html=True)  # Align with input
-        analyze_button = st.button(
-            "🔍 Analyze",
-            type="primary",
-            disabled=st.session_state.analysis_running
-        )
-    
-    st.markdown("""
-    <p style="margin-top: 1rem; opacity: 0.7; font-size: 0.9rem;">
-        💡 Press Enter or click Analyze to start. First analysis may take 1-2 minutes.
-    </p>
-    """, unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Handle analysis trigger
-    if analyze_button or st.session_state.get('trigger_analysis'):
-        if st.session_state.get('trigger_analysis'):
-            st.session_state.trigger_analysis = False
-        
-        # Validate ticker
-        if not ticker or not re.match(r'^[A-Z]{1,5}$', ticker):
-            st.error("Please enter a valid ticker (1-5 letters, e.g., AAPL, HIG)")
-            return
-        
-        # Get and validate API keys
-        gemini_key, groq_key = get_active_api_keys()
-        
-        if not gemini_key:
-            st.error("""
-            **Gemini API key required** for promise extraction. 
-            
-            **Options:**
-            1. Set `GEMINI_API_KEY` in your `.env` file
-            2. Use custom key via Settings in sidebar
-            
-            Get your free key at: https://aistudio.google.com/app/apikey
-            """)
-            return
-            
-        if not groq_key:
-            st.error("""
-            **Groq API key required** for reasoning and judgment.
-            
-            **Options:**
-            1. Set `GROQ_API_KEY` in your `.env` file  
-            2. Use custom key via Settings in sidebar
-            
-            Get your free key at: https://console.groq.com/keys
-            """)
-            return
-        
-        # Run analysis
-        run_analysis(ticker, gemini_key, groq_key)
+    if "401" in msg or "unauthorized" in msg or "api key" in msg:
+        return "API key rejected. Check GEMINI_API_KEY / GROQ_API_KEY or the sidebar overrides."
+    if "not found" in msg and "ticker" in msg:
+        return str(exc)
+    if "network" in msg or "connection" in msg or "edgar" in msg:
+        return f"Upstream request failed: {exc}"
+    return f"Analysis failed: {exc}"
 
-def run_analysis(ticker: str, gemini_key: str, groq_key: str) -> None:
-    """Execute the TempusRAG analysis pipeline with progress tracking."""
+
+def run_analysis(ticker: str) -> None:
+    gemini_key, groq_key = get_active_api_keys()
+    if not gemini_key:
+        st.error("Gemini key required for promise extraction. Set GEMINI_API_KEY or use the sidebar.")
+        return
+    if not groq_key:
+        st.error("Groq key required for delivery judgment. Set GROQ_API_KEY or use the sidebar.")
+        return
+
     st.session_state.analysis_running = True
-    
-    # Progress tracking
-    progress_bar = st.progress(0)
-    status_text = st.empty()
-    
-    stages = [
-        "🔍 Ingesting SEC filings...",
-        "✂️ Chunking documents...", 
-        "🧠 Generating embeddings...",
-        "📝 Extracting promises...",
-        "⚖️ Cross-year reasoning...",
-        "📊 Generating report..."
-    ]
-    
     try:
-        # Update progress through stages
-        for i, stage in enumerate(stages):
-            progress_bar.progress((i + 1) / len(stages))
-            status_text.text(f"Analyzing {ticker}... {stage}")
-            
-            if i < len(stages) - 1:  # Don't sleep on last stage
-                time.sleep(0.5)  # Brief delay for UX
-        
-        # Run the actual pipeline
-        status_text.text(f"Running TempusRAG pipeline for {ticker}...")
-        
+        stage_box = st.empty()
+        stage_box.markdown(stages_html("Validate"), unsafe_allow_html=True)
+
+        def on_stage(label: str) -> None:
+            stage_box.markdown(stages_html(label), unsafe_allow_html=True)
+
         report = run_tempusrag_pipeline(
             ticker=ticker,
-            company_display_name=None,  # Will use ticker as fallback
+            company_display_name=st.session_state.get("company_name") or ticker,
             gemini_api_key=gemini_key,
             groq_api_key=groq_key,
-            force_reingest=False
+            force_reingest=False,
+            on_stage=on_stage,
         )
-        
-        # Success
-        progress_bar.progress(1.0)
-        status_text.text("✅ Analysis complete!")
-        time.sleep(1)
-        
-        # Store results
+        artifacts = get_last_artifacts(ticker) or {}
+        stage_box.markdown(stages_html("Done"), unsafe_allow_html=True)
+
         st.session_state.report = report
-        st.session_state.last_analysis_time = time.time()
-        st.session_state.conversation = []  # Reset chat
-        
-        # Clear progress indicators
-        progress_bar.empty()
-        status_text.empty()
-        
-        st.success(f"Analysis complete for {report.company}! 🎉")
-        st.rerun()  # Refresh to show results
-        
-    except Exception as e:
-        progress_bar.empty()
-        status_text.empty()
-        
-        error_msg = str(e).lower()
-        
-        # Handle specific error types
-        if '401' in error_msg or 'unauthorized' in error_msg:
-            st.error("❌ **Invalid API key** - Check your credentials and try again.")
-        elif '429' in error_msg or 'rate limit' in error_msg or 'quota' in error_msg:
-            st.error("⏳ **API rate limit exceeded** - Wait a few minutes or use different API keys.")
-        elif 'network' in error_msg or 'connection' in error_msg:
-            st.error("🌐 **Connection error** - Check your internet connection and try again.")
-        elif 'not found' in error_msg and 'ticker' in error_msg:
-            st.error(f"❌ **Ticker '{ticker}' not found** - Please check the ticker symbol.")
-        else:
-            st.error(f"❌ **Analysis failed**: {str(e)}")
-            
-        logger.error(f"Pipeline failed for {ticker}: {e}")
-        
+        st.session_state.evidence = artifacts.get("delivery_evidence") or []
+        st.session_state.elapsed_seconds = artifacts.get("elapsed_seconds")
+        st.session_state.conversation = []
+        st.session_state.selected_row = 0
+        st.rerun()
+    except Exception as exc:
+        logger.exception("Pipeline failed for %s", ticker)
+        st.error(classify_error(exc))
     finally:
         st.session_state.analysis_running = False
-def render_metrics(report: CompanyCredibilityReport) -> None:
-    """Render three metric cards showing delivery statistics."""
-    st.markdown("### 📈 Key Metrics")
-    
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-label">Delivered</div>
-            <div class="metric-number" style="color: #10b981;">{report.delivered}</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-label">Abandoned</div>
-            <div class="metric-number" style="color: #ef4444;">{report.abandoned}</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col3:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-label">Pending</div>
-            <div class="metric-number" style="color: #f59e0b;">{report.partial}</div>
-        </div>
-        """, unsafe_allow_html=True)
 
-def render_domain_scores(report: CompanyCredibilityReport) -> None:
-    """Render domain scores with horizontal progress bars."""
-    if not report.domain_scores:
-        return
-        
-    st.markdown("### 🎯 Domain Performance")
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    
-    # Filter out zero scores
-    non_zero_domains = {k: v for k, v in report.domain_scores.items() if v > 0}
-    
-    if not non_zero_domains:
-        st.markdown("*No domain scores available*")
-    else:
-        for domain, score in non_zero_domains.items():
-            col1, col2, col3 = st.columns([2, 6, 1])
-            
-            with col1:
-                st.markdown(f"**{domain}**")
-            
-            with col2:
-                # Custom progress bar
-                st.markdown(f"""
-                <div class="domain-progress">
-                    <div class="domain-progress-fill" style="width: {score}%"></div>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col3:
-                st.markdown(f"**{score:.0f}**")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
 
-def render_red_flags(report: CompanyCredibilityReport) -> None:
-    """Render red flags section if any exist."""
-    if not report.red_flags:
-        return
-        
-    st.markdown(f"### 🚩 Red Flags ({len(report.red_flags)})")
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    
-    for flag in report.red_flags:
-        st.markdown(f'<div class="red-flag">{flag}</div>', unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-
-def get_domain_badge_class(domain: str) -> str:
-    """Get CSS class for domain badge based on domain name."""
-    domain_lower = domain.lower()
-    if 'technology' in domain_lower:
-        return 'domain-technology'
-    elif 'claims' in domain_lower:
-        return 'domain-claims'
-    elif 'growth' in domain_lower:
-        return 'domain-growth'
-    elif 'finance' in domain_lower:
-        return 'domain-finance'
-    elif 'operations' in domain_lower:
-        return 'domain-operations'
-    else:
-        return 'domain-operations'  # Default
-
-def get_status_badge_class(status: str) -> str:
-    """Get CSS class for status badge based on delivery status."""
-    status_lower = status.lower()
-    if 'delivered' in status_lower:
-        return 'status-delivered'
-    elif 'partial' in status_lower:
-        return 'status-partial'
-    else:
-        return 'status-abandoned'
-def render_promises_table(report: CompanyCredibilityReport) -> None:
-    """Render promises in tabbed interface with filtering options."""
-    if not hasattr(report, '_promises_by_year') and hasattr(report, 'delivery_evidence'):
-        # Extract promises from delivery evidence if available
-        promises = []
-        if report.delivery_evidence:
-            for evidence in report.delivery_evidence:
-                promises.append({
-                    'text': evidence.promise.promise_text,
-                    'domain': evidence.promise.domain,
-                    'status': evidence.status,
-                    'year': evidence.promise.year_made,
-                    'confidence': getattr(evidence.promise, 'confidence_score', 0.5)
-                })
-    else:
-        # Fallback if no detailed promise data
-        promises = []
-    
-    st.markdown("### 📋 Promises Analysis")
-    
-    # Tab counts
-    delivered_count = sum(1 for p in promises if 'delivered' in p.get('status', '').lower())
-    at_risk_count = len(promises) - delivered_count
-    
-    tab1, tab2, tab3 = st.tabs([
-        f"All ({len(promises)})",
-        f"Delivered ({delivered_count})", 
-        f"At Risk ({at_risk_count})"
-    ])
-    
-    with tab1:
-        render_promises_list(promises, "all")
-    
-    with tab2:
-        delivered_promises = [p for p in promises if 'delivered' in p.get('status', '').lower()]
-        render_promises_list(delivered_promises, "delivered")
-    
-    with tab3:
-        at_risk_promises = [p for p in promises if 'delivered' not in p.get('status', '').lower()]
-        render_promises_list(at_risk_promises, "at_risk")
-
-def render_promises_list(promises: List[Dict], filter_type: str) -> None:
-    """Render a list of promises with expandable details."""
-    if not promises:
-        st.markdown("*No promises in this category*")
-        return
-    
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    
-    for i, promise in enumerate(promises):
-        # Truncate text for display
-        display_text = promise['text'][:60] + "..." if len(promise['text']) > 60 else promise['text']
-        
-        # Create expandable section
-        with st.expander(f"{display_text}"):
-            col1, col2, col3 = st.columns([6, 2, 2])
-            
-            with col1:
-                st.markdown(f"**Full Promise:** {promise['text']}")
-            
-            with col2:
-                domain_class = get_domain_badge_class(promise['domain'])
-                st.markdown(f'<span class="{domain_class}">{promise["domain"]}</span>', 
-                           unsafe_allow_html=True)
-            
-            with col3:
-                status_class = get_status_badge_class(promise['status'])
-                st.markdown(f'<span class="{status_class}">{promise["status"]}</span>', 
-                           unsafe_allow_html=True)
-            
-            # Additional details
-            st.markdown(f"**Year Made:** {promise.get('year', 'Unknown')}")
-            st.markdown(f"**Confidence Score:** {promise.get('confidence', 0.5):.2f}")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-
-def render_chat_interface() -> None:
-    """Render the chat interface for asking questions about the company."""
-    st.markdown("### 💬 Ask about this company")
-    
-    if not st.session_state.report:
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown("*Run an analysis first to ask questions about the company*")
-        st.markdown('</div>', unsafe_allow_html=True)
-        return
-    
-    # Chat container
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    
-    # Display conversation history
-    chat_container = st.container()
-    
-    with chat_container:
-        if st.session_state.conversation:
-            for message in st.session_state.conversation:
-                if message['role'] == 'user':
-                    st.markdown(f"""
-                    <div class="chat-message chat-user">
-                        {message['content']}
-                    </div>
-                    """, unsafe_allow_html=True)
-                else:
-                    st.markdown(f"""
-                    <div class="chat-message chat-assistant">
-                        {message['content']}
-                    </div>
-                    """, unsafe_allow_html=True)
-                    
-                    # Show sources if available
-                    if 'sources' in message:
-                        sources_text = " | ".join([f"[{s}]" for s in message['sources']])
-                        st.markdown(f"**Sources:** {sources_text}")
-        else:
-            st.markdown("*Start a conversation by asking a question below*")
-    
-    # Input area
-    col1, col2 = st.columns([4, 1])
-    
-    with col1:
-        user_question = st.text_input(
-            "Ask a question",
-            placeholder="e.g., What technology investments did they promise?",
-            key="chat_input"
+def evidence_rows(evidence: list[DeliveryEvidence]) -> list[dict[str, Any]]:
+    rows = []
+    for item in evidence:
+        rows.append(
+            {
+                "Year": item.promise.year_made,
+                "Domain": item.promise.domain,
+                "Status": item.status,
+                "Score": item.delivery_score,
+                "Deadline": item.promise.deadline_mentioned or "—",
+                "Found": item.year_found if item.year_found is not None else "—",
+                "Commitment": item.promise.promise_text,
+                "Evidence": item.evidence_text or "—",
+                "Reasoning": item.judge_reasoning,
+                "Confidence": item.promise.confidence_score if item.promise.confidence_score is not None else "—",
+                "Page": item.promise.page_number,
+            }
         )
-    
-    with col2:
-        st.markdown("<br>", unsafe_allow_html=True)  # Align with input
-        send_button = st.button("Send", type="primary")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Handle question submission
-    if send_button and user_question.strip():
-        handle_chat_question(user_question.strip())
-    elif st.session_state.get('submit_question'):
-        # Handle Enter key submission
-        question = st.session_state.submit_question
-        st.session_state.submit_question = ""
-        handle_chat_question(question)
+    return rows
 
-def handle_chat_question(question: str) -> None:
-    """Process a chat question and generate response."""
-    if not st.session_state.report:
-        st.error("Please run an analysis first")
-        return
-    
-    # Add user message to conversation
-    st.session_state.conversation.append({
-        'role': 'user',
-        'content': question
-    })
-    
+
+def render_masthead(report: CompanyCredibilityReport | None) -> None:
+    years = ""
+    elapsed = ""
+    if report:
+        years = " · ".join(str(y) for y in report.years_analyzed) or "—"
+        if st.session_state.elapsed_seconds is not None:
+            elapsed = f"{st.session_state.elapsed_seconds:.0f}s last run"
+    st.markdown(
+        f"""
+<div class="tr-masthead">
+  <div>
+    <p class="tr-wordmark">TempusRAG</p>
+    <p class="tr-sub">Executive commitment tracking from temporally indexed 10-K filings</p>
+  </div>
+  <div class="tr-meta">{years}<br>{elapsed}</div>
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_toolbar() -> None:
+    directory: list[dict[str, str]] = []
     try:
-        # Get API keys for query processing
-        gemini_key, groq_key = get_active_api_keys()
-        
-        # Process the query
-        with st.spinner("Thinking..."):
-            result = process_query(
-                query=question,
-                ticker=st.session_state.ticker,
-                conversation_history=st.session_state.conversation[:-1],  # Exclude current question
-                api_key=gemini_key  # Query system uses Gemini
-            )
-        
-        # Extract answer and sources
-        answer = result.get('answer', 'No answer generated')
-        source_chunks = result.get('source_chunks', [])
-        
-        # Format sources
-        sources = []
-        if source_chunks:
-            sources = [f"Chunk_{i+1}" for i in range(len(source_chunks))]
-        
-        # Add assistant response
-        assistant_message = {
-            'role': 'assistant',
-            'content': answer
-        }
-        if sources:
-            assistant_message['sources'] = sources
-        
-        st.session_state.conversation.append(assistant_message)
-        
-        # Clear input and refresh
-        st.session_state.chat_input = ""
-        st.rerun()
-        
-    except Exception as e:
-        st.error(f"Failed to generate response: {str(e)}")
-        logger.error(f"Chat query failed: {e}")
+        directory = issuer_directory()
+    except Exception as exc:
+        logger.exception("Failed to load SEC issuer directory")
+        st.session_state["_directory_error"] = str(exc)
 
-def render_footer() -> None:
-    """Render the application footer with attribution."""
-    st.markdown("---")
-    st.markdown("""
-    <div style="text-align: center; padding: 2rem 0; opacity: 0.7;">
-        <p style="margin: 0; font-size: 0.9rem;">
-            Real SEC filings analyzed via Claude AI | Powered by Groq LLM reasoning | 
-            Last updated: {timestamp}
-        </p>
-    </div>
-    """.format(
-        timestamp=time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime())
-    ), unsafe_allow_html=True)
+    if "issuer_search_box" not in st.session_state:
+        st.session_state.issuer_search_box = st.session_state.issuer_query
 
-def render_empty_state() -> None:
-    """Render the initial empty state when no analysis has been run."""
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown("""
-    ## 🚀 Get Started
-    
-    Enter a company ticker above to begin comprehensive credibility analysis.
-    
-    **What TempusRAG does:**
-    1. **Ingests SEC filings** from recent years
-    2. **Extracts forward-looking promises** using AI
-    3. **Judges delivery** by analyzing subsequent filings  
-    4. **Generates credibility scores** across business domains
-    5. **Enables natural language queries** about the company
-    
-    **Example tickers to try:** HIG, NVDA, AAPL, TSLA, MSFT
-    
-    *First analysis takes 1-2 minutes while we process the filings*
-    """)
-    st.markdown('</div>', unsafe_allow_html=True)
+    search_col, btn_col = st.columns([4.2, 1.0])
+    with search_col:
+        st.text_input(
+            "Issuer",
+            placeholder="Company name or ticker — Apple, Hartford, AAPL, HIG",
+            label_visibility="collapsed",
+            key="issuer_search_box",
+        )
+        st.session_state.issuer_query = st.session_state.issuer_search_box or ""
 
-@st.cache_resource
-def load_cik_map():
-    """Cache the CIK mapping to avoid repeated API calls."""
-    try:
-        from src.ingestion import load_ticker_cik_map
-        return load_ticker_cik_map()
-    except Exception as e:
-        logger.error(f"Failed to load CIK map: {e}")
-        return {}
+    matches = search_issuers(st.session_state.issuer_query, directory, limit=8)
 
-@st.cache_data(ttl=3600)  # Cache for 1 hour
-def cache_pipeline_result(ticker: str, timestamp: int):
-    """Cache pipeline results to avoid re-analysis."""
-    # This is a placeholder - actual caching would store the report
-    # For now, we rely on session state
-    pass
-def main() -> None:
-    """Main application entry point."""
-    # Initialize session state
-    init_session_state()
-    
-    # Inject custom CSS
-    render_custom_css()
-    
-    # Render header
-    render_header()
-    
-    # Sidebar content
-    with st.sidebar:
-        render_sidebar_api_info()
-        render_sidebar_requirements()
-    
-    # Main content area
-    if st.session_state.report is None:
-        # No analysis yet - show input and instructions
-        render_ticker_input()
-        render_empty_state()
+    if directory and st.session_state.issuer_query.strip() and matches:
+        labels = [f"{m['ticker']}  —  {m['title']}" for m in matches]
+        current_label = None
+        for label, row in zip(labels, matches):
+            if row["ticker"] == st.session_state.ticker:
+                current_label = label
+                break
+        index = labels.index(current_label) if current_label in labels else 0
+        picked = st.selectbox(
+            "Matching issuers",
+            labels,
+            index=index,
+            help="Resolved from the SEC issuer list.",
+        )
+        chosen = matches[labels.index(picked)]
+        st.session_state.ticker = chosen["ticker"]
+        st.session_state.company_name = chosen["title"]
+    elif st.session_state.issuer_query.strip() and not matches:
+        st.caption("No listed match.")
     else:
-        # Analysis complete - show results
-        report = st.session_state.report
-        
-        # Hero card with main score
-        render_hero_card(report)
-        
-        # Two-column layout for detailed results
-        left_col, right_col = st.columns([2, 1])
-        
-        with left_col:
-            # Left column: Metrics and analysis
-            render_metrics(report)
-            render_domain_scores(report)
-            render_red_flags(report)
-            render_promises_table(report)
-        
-        with right_col:
-            # Right column: Chat interface
-            render_chat_interface()
-    
-    # Footer
-    render_footer()
+        resolved = resolve_issuer(st.session_state.ticker, directory)
+        if resolved:
+            st.session_state.company_name = resolved["title"]
 
-# Handle Enter key submission for ticker input
-if 'ticker_input' in st.session_state and st.session_state.ticker_input:
-    if st.session_state.ticker_input != st.session_state.ticker:
-        st.session_state.ticker = st.session_state.ticker_input.upper()
-        # Trigger analysis on Enter if ticker is valid
-        if re.match(r'^[A-Z]{1,5}$', st.session_state.ticker):
-            st.session_state.trigger_analysis = True
-            st.rerun()
+    st.markdown(
+        f'<p class="tr-picked"><strong>{st.session_state.ticker}</strong>'
+        f" · {st.session_state.company_name}</p>",
+        unsafe_allow_html=True,
+    )
 
-# Application entry point
+    with btn_col:
+        analyze = st.button(
+            "Analyze",
+            type="primary",
+            disabled=st.session_state.analysis_running,
+            use_container_width=True,
+        )
+
+    if st.session_state.get("_directory_error") and not directory:
+        st.warning(
+            "Could not load the SEC issuer directory. You can still enter a ticker if it is known. "
+            f"({st.session_state['_directory_error']})"
+        )
+
+    if analyze:
+        ticker = st.session_state.ticker
+        if not re.match(r"^[A-Z][A-Z0-9.-]{0,9}$", ticker):
+            fallback = resolve_issuer(st.session_state.issuer_query, directory)
+            if fallback:
+                ticker = fallback["ticker"]
+                st.session_state.ticker = ticker
+                st.session_state.company_name = fallback["title"]
+            else:
+                st.error("Select a matching issuer from the list, or enter a listed ticker.")
+                return
+        run_analysis(ticker)
+
+
+def render_hero(report: CompanyCredibilityReport) -> None:
+    total = report.total_promises or 0
+    delivered_pct = (report.delivered / total * 100) if total else 0.0
+    years_n = len(report.years_analyzed)
+    thesis = (
+        f"{report.company} delivered on {report.delivered} of {total} extracted forward-looking "
+        f"commitments across {years_n} fiscal year{'s' if years_n != 1 else ''} "
+        f"({delivered_pct:.0f}% delivered). "
+        f"{len(report.red_flags)} risk flag{'s' if len(report.red_flags) != 1 else ''}."
+    )
+    st.markdown(
+        f"""
+<div class="tr-score-wrap">
+  <div class="tr-score-label">Credibility score</div>
+  <div class="tr-score">{report.overall_score:.0f}<span> / 100</span></div>
+  <p class="tr-thesis">{thesis}</p>
+</div>
+<div class="tr-kpis">
+  <div class="tr-kpi"><div class="n">{report.delivered}</div><div class="l">Delivered</div></div>
+  <div class="tr-kpi"><div class="n">{report.partial}</div><div class="l">Partial</div></div>
+  <div class="tr-kpi"><div class="n">{report.abandoned}</div><div class="l">Abandoned</div></div>
+  <div class="tr-kpi"><div class="n">{total}</div><div class="l">Commitments</div></div>
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_domains_and_flags(report: CompanyCredibilityReport) -> None:
+    left, right = st.columns(2)
+    with left:
+        st.markdown("**Domain scores**")
+        domains = {k: v for k, v in report.domain_scores.items() if v is not None}
+        if not domains:
+            st.caption("No domain scores yet.")
+        else:
+            for name, score in sorted(domains.items(), key=lambda x: x[1], reverse=True):
+                st.progress(min(max(score / 100.0, 0.0), 1.0), text=f"{name}  {score:.0f}")
+    with right:
+        st.markdown("**Flags**")
+        if not report.red_flags:
+            st.caption("None raised by the rule layer.")
+        else:
+            for flag in report.red_flags:
+                st.markdown(f'<div class="tr-flag">{flag}</div>', unsafe_allow_html=True)
+
+
+def render_commitments() -> None:
+    evidence: list[DeliveryEvidence] = st.session_state.evidence or []
+    st.markdown("**Commitments**")
+    if not evidence:
+        st.caption(
+            "Row-level judgments were not returned for this run. "
+            "Headline counts above still come from the scored report."
+        )
+        return
+
+    rows = evidence_rows(evidence)
+    statuses = ["All", *STATUS_ORDER]
+    filter_col, _ = st.columns([1.2, 3])
+    with filter_col:
+        choice = st.selectbox("Status", statuses, label_visibility="collapsed")
+        st.session_state.status_filter = choice
+
+    if choice != "All":
+        rows = [r for r in rows if r["Status"] == choice]
+
+    display = [
+        {k: r[k] for k in ("Year", "Domain", "Status", "Score", "Deadline", "Commitment")}
+        for r in rows
+    ]
+    event = st.dataframe(
+        display,
+        hide_index=True,
+        use_container_width=True,
+        on_select="rerun",
+        selection_mode="single-row",
+        height=360,
+    )
+
+    selected = 0
+    try:
+        selected_rows = event.selection.rows  # type: ignore[attr-defined]
+        if selected_rows:
+            selected = int(selected_rows[0])
+    except Exception:
+        selected = 0
+
+    if not rows:
+        st.caption("No commitments in this filter.")
+        return
+
+    selected = min(selected, len(rows) - 1)
+    detail = rows[selected]
+    st.markdown("**Selected judgment**")
+    st.write(detail["Commitment"])
+    st.caption(
+        f"{detail['Domain']} · made {detail['Year']} · deadline {detail['Deadline']} · "
+        f"evidence year {detail['Found']} · page {detail['Page']} · "
+        f"confidence {detail['Confidence']}"
+    )
+    st.markdown("**Evidence**")
+    st.write(detail["Evidence"])
+    st.markdown("**Judge reasoning**")
+    st.write(detail["Reasoning"])
+
+
+def conversation_as_strings() -> list[str]:
+    out: list[str] = []
+    for message in st.session_state.conversation:
+        role = message.get("role", "")
+        content = message.get("content", "")
+        out.append(f"{role}: {content}")
+    return out
+
+
+def format_chunk_cite(chunk: Any) -> str:
+    year = getattr(chunk, "year", "?")
+    section = getattr(chunk, "section", "")
+    subsection = getattr(chunk, "subsection", "")
+    path = " > ".join(p for p in (section, subsection) if p)
+    return f"{year} {path}".strip()
+
+
+def render_ask() -> None:
+    st.markdown("**Filing Q&A**")
+    st.caption("Ask after the report — answers cite retrieved 10-K chunks.")
+
+    if not st.session_state.conversation:
+        st.caption("No questions yet.")
+        return
+
+    for message in st.session_state.conversation:
+        with st.chat_message(message["role"]):
+            st.write(message["content"])
+            cites = message.get("cites") or []
+            if cites:
+                st.markdown(
+                    '<p class="tr-cite">' + " · ".join(cites) + "</p>",
+                    unsafe_allow_html=True,
+                )
+
+
+def handle_chat_prompt(prompt: str) -> None:
+    st.session_state.conversation.append({"role": "user", "content": prompt})
+    gemini_key, _ = get_active_api_keys()
+    try:
+        result = process_query(
+            query=prompt,
+            ticker=st.session_state.ticker,
+            conversation_history=conversation_as_strings()[:-1],
+            api_key=gemini_key,
+        )
+        chunks = result.get("source_chunks") or []
+        cites = [format_chunk_cite(c) for c in chunks[:5]]
+        st.session_state.conversation.append(
+            {
+                "role": "assistant",
+                "content": result.get("answer") or "No answer generated.",
+                "cites": cites,
+            }
+        )
+    except Exception as exc:
+        logger.exception("Query failed")
+        st.session_state.conversation.append(
+            {"role": "assistant", "content": classify_error(exc)}
+        )
+    st.rerun()
+
+
+def render_empty() -> None:
+    st.caption("Demo: HIG. Score is an LLM judge, not an audit.")
+
+
+def main() -> None:
+    init_session_state()
+    inject_css()
+    render_sidebar()
+    render_masthead(st.session_state.report)
+    render_toolbar()
+
+    report = st.session_state.report
+    if report is None:
+        render_empty()
+        return
+
+    render_hero(report)
+    render_domains_and_flags(report)
+    st.divider()
+    table_col, ask_col = st.columns([1.55, 1])
+    with table_col:
+        render_commitments()
+    with ask_col:
+        render_ask()
+
+    prompt = st.chat_input("Ask about this issuer’s filings")
+    if prompt:
+        handle_chat_prompt(prompt)
+
+
 if __name__ == "__main__":
     main()

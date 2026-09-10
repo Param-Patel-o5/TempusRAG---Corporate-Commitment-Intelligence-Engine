@@ -14,9 +14,9 @@ dist/
 build/
 
 # Runtime data
-TempusRAG/chroma_store/
-TempusRAG/logs/
-TempusRAG/data/filings/
+chroma_store/
+logs/
+data/filings/
 
 # IDE
 .idea/

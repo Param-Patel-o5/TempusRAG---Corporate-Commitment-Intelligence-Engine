@@ -33,6 +33,7 @@ ARCHIVES_URL_TEMPLATE = "https://www.sec.gov/Archives/edgar/data/{cik}/{accessio
 
 # Global cache
 _ticker_cik_cache = None
+_company_directory: list[dict[str, str]] | None = None
 _last_request_time = 0.0
 
 
@@ -72,27 +73,41 @@ def _make_request(url: str) -> requests.Response:
         raise EdgarFetchError(f"Request failed: {e}") from e
 
 
-def load_ticker_cik_map() -> dict[str, str]:
-    """Load ticker->CIK mapping from SEC, with caching."""
-    global _ticker_cik_cache
-    
-    if _ticker_cik_cache is not None:
-        return _ticker_cik_cache
-    
+def _ensure_ticker_cache() -> None:
+    """Fetch company_tickers.json once; fill ticker→CIK map and name directory."""
+    global _ticker_cik_cache, _company_directory
+
+    if _ticker_cik_cache is not None and _company_directory is not None:
+        return
+
     logger.info("Fetching SEC ticker-to-CIK mapping")
     response = _make_request(COMPANY_TICKERS_URL)
     data = response.json()
-    
-    # Convert to ticker -> zero-padded CIK mapping
-    ticker_map = {}
+
+    ticker_map: dict[str, str] = {}
+    directory: list[dict[str, str]] = []
     for entry in data.values():
         ticker = entry["ticker"].upper()
         cik = str(entry["cik_str"]).zfill(10)
+        title = (entry.get("title") or ticker).strip()
         ticker_map[ticker] = cik
-    
-    logger.info(f"Loaded {len(ticker_map)} ticker-to-CIK mappings")
+        directory.append({"ticker": ticker, "title": title, "cik": cik})
+
+    logger.info("Loaded %d ticker-to-CIK mappings", len(ticker_map))
     _ticker_cik_cache = ticker_map
-    return ticker_map
+    _company_directory = directory
+
+
+def load_ticker_cik_map() -> dict[str, str]:
+    """Load ticker->CIK mapping from SEC, with caching."""
+    _ensure_ticker_cache()
+    return _ticker_cik_cache or {}
+
+
+def load_company_directory() -> list[dict[str, str]]:
+    """Return [{ticker, title, cik}, ...] from the same SEC ticker file as the CIK map."""
+    _ensure_ticker_cache()
+    return list(_company_directory or [])
 
 
 def get_recent_10k_filings(ticker: str, cik_map: dict[str, str], count: int = 5) -> list[dict]:

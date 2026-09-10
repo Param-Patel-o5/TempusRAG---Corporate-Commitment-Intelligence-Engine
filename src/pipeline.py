@@ -9,7 +9,7 @@ Given a ticker, produces a CompanyCredibilityReport from SEC filings.
 
 import logging
 import time
-from typing import Dict, List, Optional
+from typing import Callable, Dict, List, Optional
 
 from src.ingestion import load_ticker_cik_map, ingest_company
 from src.chunker import chunk_year_sections
@@ -21,6 +21,14 @@ from src.config import DATA_DIR, GEMINI_API_KEY, GROQ_API_KEY
 from src.models import CompanyCredibilityReport, Chunk, Promise, DeliveryEvidence
 
 logger = logging.getLogger(__name__)
+
+# Last-run artifacts for the dashboard (not part of the report schema).
+_LAST_ARTIFACTS: Dict[str, dict] = {}
+
+
+def get_last_artifacts(ticker: str) -> Optional[dict]:
+    """Return delivery evidence and promises from the most recent pipeline run."""
+    return _LAST_ARTIFACTS.get(ticker.upper())
 
 
 def validate_ticker(ticker: str, cik_map: dict) -> str:
@@ -52,7 +60,8 @@ def run_tempusrag_pipeline(
     company_display_name: Optional[str] = None,
     gemini_api_key: Optional[str] = None,
     groq_api_key: Optional[str] = None,
-    force_reingest: bool = False
+    force_reingest: bool = False,
+    on_stage: Optional[Callable[[str], None]] = None,
 ) -> CompanyCredibilityReport:
     """
     Run complete TempusRAG pipeline for a company ticker.
@@ -63,6 +72,7 @@ def run_tempusrag_pipeline(
         gemini_api_key: Optional override for Gemini key (uses config if None)
         groq_api_key: Optional override for Groq key (uses config if None)
         force_reingest: If True, re-download and re-embed filings even if cached
+        on_stage: Optional callback invoked with the current stage label
         
     Returns:
         CompanyCredibilityReport with analysis results
@@ -82,16 +92,19 @@ def run_tempusrag_pipeline(
     groq_key = groq_api_key or GROQ_API_KEY
     
     logger.info(f"Starting TempusRAG pipeline for {ticker} ({company_display_name})")
-    
+
+    def stage(label: str) -> None:
+        logger.info(label)
+        if on_stage:
+            on_stage(label)
+
     try:
-        # Step 1/8: Load CIK mapping and validate ticker
-        logger.info("Step 1/8: Loading CIK mapping and validating ticker...")
+        stage("Validate")
         cik_map = load_ticker_cik_map()
         validated_ticker = validate_ticker(ticker, cik_map)
         logger.info(f"Validated ticker: {validated_ticker}")
-        
-        # Step 2/8: Ingest company filings
-        logger.info("Step 2/8: Ingesting SEC filings...")
+
+        stage("Ingest")
         try:
             year_sections = ingest_company(validated_ticker, cik_map, DATA_DIR)
             if not year_sections:
@@ -101,8 +114,7 @@ def run_tempusrag_pipeline(
             logger.error(f"Ingestion failed for {validated_ticker}: {e}")
             raise Exception(f"Failed to ingest filings for {validated_ticker}: {e}")
         
-        # Step 3/8: Chunk filings
-        logger.info("Step 3/8: Chunking filings...")
+        stage("Chunk")
         all_chunks = {}
         total_chunks = 0
         try:
@@ -122,8 +134,7 @@ def run_tempusrag_pipeline(
             # Continue with empty chunks - may have cached embeddings
             all_chunks = {}
         
-        # Step 4/8: Embed and store chunks
-        logger.info("Step 4/8: Embedding and storing chunks...")
+        stage("Embed")
         try:
             for year, chunks in all_chunks.items():
                 if chunks:  # Only embed if we have chunks
@@ -134,8 +145,7 @@ def run_tempusrag_pipeline(
             logger.error(f"Embedding failed: {e}")
             logger.warning("Continuing with cached embeddings if available")
         
-        # Step 5/8: Extract promises
-        logger.info("Step 5/8: Extracting promises...")
+        stage("Extract")
         all_promises = {}
         total_promises = 0
         try:
@@ -152,8 +162,7 @@ def run_tempusrag_pipeline(
             logger.warning("Continuing with empty promises - will generate report without promise analysis")
             all_promises = {}
         
-        # Step 6/8: Reason across years (judge promise delivery)
-        logger.info("Step 6/8: Reasoning across years...")
+        stage("Judge")
         delivery_evidence = []
         try:
             if all_promises:
@@ -170,8 +179,7 @@ def run_tempusrag_pipeline(
             logger.warning("Continuing without delivery evidence - will use confidence-only scoring")
             delivery_evidence = []
         
-        # Step 7/8: Generate credibility report
-        logger.info("Step 7/8: Generating credibility report...")
+        stage("Score")
         try:
             report = generate_credibility_report(
                 company_ticker=validated_ticker,
@@ -184,12 +192,18 @@ def run_tempusrag_pipeline(
             logger.error(f"Report generation failed: {e}")
             raise Exception(f"Failed to generate credibility report: {e}")
         
-        # Step 8/8: Complete
+        stage("Done")
         elapsed_time = time.time() - start_time
         logger.info(f"Pipeline completed successfully in {elapsed_time:.2f} seconds")
         logger.info(f"Final report: {report.total_promises} promises, "
                    f"overall score {report.overall_score:.1f}/100.0")
-        
+
+        _LAST_ARTIFACTS[validated_ticker] = {
+            "delivery_evidence": delivery_evidence,
+            "promises_by_year": all_promises,
+            "elapsed_seconds": elapsed_time,
+        }
+
         return report
         
     except ValueError:
