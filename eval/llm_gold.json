@@ -1,0 +1,501 @@
+{
+  "meta": {
+    "issuer": "HIG",
+    "issuer_name": "The Hartford",
+    "created_at": "2026-09-10T18:07:07Z",
+    "source": "Cached SEC 10-K plaintext in data/filings/HIG_YYYY.txt (EDGAR HTML parse, whitespace-normalized).",
+    "n_extract": 20,
+    "n_judge": 15,
+    "n_qa": 10,
+    "n_extract_none": 7,
+    "n_extract_with_deadline": 8,
+    "caveat": "Hand-labeled from excerpts; HIG only; not a statistically powered eval."
+  },
+  "labeling_rules": [
+    "Do not invent facts that are not in the excerpt. Historical results, tables, and auditor opinions are not forward-looking commitments.",
+    "A promise is a management intention, plan, authorization, or target about future activity. Accounting policy text ('if the Company intends to sell AFS securities') is not a business commitment unless labeled as such.",
+    "has_deadline is true only when a calendar date, year, or named period (e.g. May 2023, year-end 2023, December 31, 2024) is attached to the commitment.",
+    "Domains: Finance = capital, buybacks, dividends, reserves, investments; Operations = workforce, DEI, restructuring, disclosure practices; Technology = cyber, IT, platforms; Claims = claims handling; Growth = premium/market expansion.",
+    "Delivered: later excerpt shows the commitment completed or the dated program expired after being used as described, with matching metrics or an explicit expiry-plus-execution statement.",
+    "Partial: topic confirmed with incomplete metrics, discretionary remaining capacity, or nearly-complete dollar targets (e.g. $124 of $126).",
+    "Pending: stated deadline has not yet been reached in the evidence year, even if there is progress. Progress without a passed deadline is not Delivered.",
+    "Silently Abandoned: deadline has passed (or there is no deadline and the evidence is unrelated) and the excerpt does not address the commitment. Do not treat unrelated ICFR/table text as delivery.",
+    "Adjacent judge errors: Delivered↔Partial and Partial↔Pending. Far errors: Delivered↔Silently Abandoned and Pending↔Silently Abandoned.",
+    "The 0–100 credibility rollup is not gold. Score bands are a coarse check on judge calibration only.",
+    "Issuer is The Hartford (HIG) only. Excerpts are whitespace-normalized copies from cached 10-K text."
+  ],
+  "extract_gold": [
+    {
+      "id": "E01",
+      "year": 2023,
+      "source": "Item 1 Business — DEI / human capital",
+      "excerpt": "Diversity, Equity and Inclusion The Hartford seeks to be an insurance industry leader in ensuring a diverse workforce and creating an equitable and inclusive workplace, enabling us to attract and leverage top talent to meet our business goals. We are committed to ethical conduct and a bias-free workplace for all employees as we continue building, enhancing and sustaining an inclusive supportive culture that reflects the diversity of our customer base. We take a whole-company approach to ensure we meet our stated DEI goals. We hold our leaders accountable for making progress against our DEI goals. To that end, the Company requires each business and functional area, in partnership with our Human Resources team, to create and adopt individualized DEI plans with specific DEI goals. Leaders meet with the CEO twice a year to review progress against those goals and final results are then considered as part of the annual performance assessment process. We continue to invest in and accelerate a wide range of strategies to improve representation of talent that’s demographically underrepresented in the insurance industry, including targeted initiatives to improve the representation of women and people of color. One of the ways we do this is by working to mitigate bias in our Human Resource systems and offering programs to educate employees on minimizing unconscious bias in the workplace. We have nine Employee Resource Groups (“ERG’s”) that are voluntary participation groups led by employees, dedicated to fostering a diverse and inclusive workplace. These groups focus on the development and success of the Company’s employees through education, networking, mentorship and community volunteer opportunities. As of December 31, 2022, over 55% of employees were members of at least one ERG. In 2022, over 3,600 unique participants engaged in Courageous Conversations, a program to allow employees to respectfully exchange perspectives, that ultimately contributes to a more inclusive workplace. Additionally, one of our enterprise leadership programs, the \"Empower\" program, is designed to accelerate the readiness and encourage sponsorship of high performing, high potential people of co",
+      "gold": [
+        {
+          "promise_text_short": "Leaders held accountable to DEI goals with CEO reviews twice a year",
+          "domain": "Operations",
+          "has_deadline": false
+        },
+        {
+          "promise_text_short": "Improve representation of women and people of color; 2021 performance shares tied to year-end 2023 goals",
+          "domain": "Operations",
+          "has_deadline": true
+        }
+      ]
+    },
+    {
+      "id": "E02",
+      "year": 2023,
+      "source": "Item 1 Business — 2030 representation / Sustainability Report",
+      "excerpt": "-out for these awards is warranted based upon performance against predetermined year-end 2023 representation goals for women and people of color in executive level roles. This change was described in greater detail in our 2022 proxy statement. We currently expect that the 2024 and 2027 performance share awards will include a similar modifier to encourage continued progress toward the Company's 2030 representation goals. For more information on the Company’s human capital including our commitments, goals, initiatives and progress, as well as our employee demographics, refer to The Hartford’s Sustainability Highlight Report available on the investor relations section of the Company’s website at: https://ir.thehartford.com . The Hartford’s 2022 Sustainability Report is expected to be published following the Company’s annual meeting in May 2023. AVAILABLE INFORMATION The Company’s Internet address is www.thehartford.com. Our annual report on Form 10-K, quarterly reports on Form 10-Q, current reports on Form 8-K, and amendments to those reports are available, without charge, on the investor relations section of our website, https://ir.thehartford.com, as soon as reasonably practicable after they are electronically filed with, or furnished to, the SEC. Reports filed with the SEC may be viewed at www.sec.gov. References in this report to our website address are provided only as a convenience and do not constitute, and should not be viewed as, an incorporation by reference of the information contained on, or available through, the website. Therefore, such information should not be",
+      "gold": [
+        {
+          "promise_text_short": "2024 and 2027 performance share awards expected to include a modifier toward 2030 representation goals",
+          "domain": "Operations",
+          "has_deadline": true
+        },
+        {
+          "promise_text_short": "2022 Sustainability Report expected after the May 2023 annual meeting",
+          "domain": "Operations",
+          "has_deadline": true
+        }
+      ]
+    },
+    {
+      "id": "E03",
+      "year": 2022,
+      "source": "Notes — Equity Repurchase Program (authorization through Dec 31, 2022)",
+      "excerpt": "Equity Repurchase Program In December 2020, the Board of Directors authorized an equity repurchase plan for $ 1.5 billion for the period commencing January 1, 2021 through December 31, 2022. The Board of Directors increased this authorization by $ 1 billion in April, 2021 and by $ 500 in October, 2021, bringing the aggregate repurchase authorization to $ 3.0 billion through December 31, 2022. For the year ended December 31, 2021, The Hartford repurchased $ 1.7 billion ( 25.9 million shares) of common stock under this program. The timing of any repurchases of shares under the remaining equity repurchase authorization is dependent upon several factors, including the market price of the Company's securities, the Company's capital position, consideration of the effect of any repurchases on the Company's financial strength or credit ratings, the Company's blackout periods, and other considerations. Under The Hartford’s previous $ 1.0 billion share repurchase program authorized by its Board of Directors in February 2019 and which expired on December 31, 2020, the Company repurchased 2.7 million and 3.4 million shares for $ 150 and $ 200 during the years ended 2020 and 2019, respectively. Preferred Stock The Company has outstanding 13.8 million depositary shares each representing 1/1000th interest in a share of the Company’s 6.0% Series G non-cumulative perpetual preferred stock (“Preferred Stock”) with a liquidation preference of $ 25,000 per share (equivalent to $ 25.00 per depositary share). The Preferred Stock is perpetual and has no maturity date. Dividends are recorded when",
+      "gold": [
+        {
+          "promise_text_short": "$3.0 billion aggregate equity repurchase authorization through December 31, 2022",
+          "domain": "Finance",
+          "has_deadline": true
+        }
+      ]
+    },
+    {
+      "id": "E04",
+      "year": 2023,
+      "source": "Notes — Equity Repurchase Program ($3.0B Aug 2022–Dec 2024)",
+      "excerpt": "Equity Repurchase Program In July, 2022, the Board of Directors approved a share repurchase authorization for up to $ 3.0 billion effective from August 1, 2022 to December 31, 2024. As of December 31, 2022, the Company has $ 2.75 billion remaining for equity repurchases under this share repurchase program. The Hartford's $ 3.0 billion equity repurchase program authorized by its Board of Directors in December 2020, expired on December 31, 2022. During the year ended December 31, 2022 and 2021, the Company repurchased $ 1.6 billion ( 22.3 million shares) and $ 1.7 billion ( 25.9 million shares), respectively, of common stock under these repurchase programs. During the period from January 1, 2023 through February 23, 2023, the Company repurchased $ 209 ( 2.7 million shares) under these repurchase programs. The timing of any repurchases of shares under the remaining equity repurchase authorization is dependent upon several factors, including the market price of the Company's securities, the Company's capital position, consideration of the effect of any repurchases on the Company's financial strength or credit ratings, the Company's blackout periods, and other considerations. Under The Hartford’s previous $ 1.0 billion share repurchase program authorized by its Board of Directors in February 2019 and which expired on December 31, 2020, the Company repurchased 2.7 million shares for $ 150 during the year ended 2020. Preferred Stock The Company has outstanding 13.8 million depositary shares each representing 1/1000th interest in a share of the Company’s 6.0% Series G non-cumulativ",
+      "gold": [
+        {
+          "promise_text_short": "$3.0 billion share repurchase authorization from August 1, 2022 to December 31, 2024",
+          "domain": "Finance",
+          "has_deadline": true
+        }
+      ]
+    },
+    {
+      "id": "E05",
+      "year": 2024,
+      "source": "Notes — Equity Repurchase Program (progress on $3.0B)",
+      "excerpt": "Equity Repurchase Program In July, 2022, the Board of Directors approved a share repurchase authorization for up to $ 3.0 billion effective from August 1, 2022 to December 31, 2024. As of December 31, 2023, the Company has $ 1.35 billion remaining for equity repurchases under this share repurchase program. During the year ended December 31, 2023 the Company repurchased $ 1.4 billion ( 19.2 million shares) under this repurchase program. The Hartford's $ 3.0 billion equity repurchase program authorized by its Board of Directors in December 2020 expired on December 31, 2022. During the years ended December 31, 2022 and 2021, the Company repurchased $ 1.6 billion ( 22.3 million shares) and $ 1.7 billion ( 25.9 million shares), respectively, of common stock under these repurchase programs. During the period from January 1, 2024 through February 22, 2024, the Company repurchased $ 200 ( 2.3 million shares). The timing of any repurchases of shares under the remaining equity repurchase authorization is dependent upon several factors, including the market price of the Company's securities, the Company's capital position, consideration of the effect of any repurchases on the Company's financial strength or credit ratings, the Company's blackout periods, and other considerations. As of December 31, 2023, the Company accrued $ 12 in excise taxes on share repurchases, partially reduced by share issuances, which are reported in other liabilities on the Company's Consolidated Balance Sheets. Preferred Stock The Company has outstanding 13.8 million depositary shares each representing 1/100",
+      "gold": [
+        {
+          "promise_text_short": "$3.0 billion share repurchase authorization through December 31, 2024, $1.35 billion remaining at year-end 2023",
+          "domain": "Finance",
+          "has_deadline": true
+        }
+      ]
+    },
+    {
+      "id": "E06",
+      "year": 2025,
+      "source": "Notes — new $3.3B authorization through Dec 31, 2026",
+      "excerpt": "Equity Repurchase Program In July, 2024, the Board of Directors approved a share repurchase authorization for up to $ 3.3 billion effective from August 1, 2024 to December 31, 2026. As of December 31, 2024, the Company has $ 3.15 billion remaining for equity repurchases under this share repurchase program. The Hartford's $ 3.0 billion equity repurchase program authorized by its Board of Directors in August 2022, expired on December 31, 2024. The Hartford's previous $ 3.0 billion equity repurchase program authorized by its Board of Directors in December 2020 expired on December 31, 2022. During the year ended December 31, 2024, 2023, and 2022 the Company repurchased $ 1.5 billion ( 14.4 million shares), $ 1.4 billion ( 19.2 million shares) and $ 1.6 billion ( 22.3 million shares), respectively, of common stock under these repurchase programs. During the period from January 1, 2025 through February 20, 2025, the Company repurchased $ 248 ( 2.2 million shares) under the $ 3.3 billion repurchase program effective from August 1, 2024 to December 31, 2026. The timing of any repurchases of shares is dependent on several factors, including the market price of the Company's securities, the Company's capital position, consideration of the effect of any repurchases on the Company's financial strength or credit ratings, the Company's blackout periods, and other considerations. The Company accrued $ 12 in excise taxes on share repurchases as of December 31, 2024 and 2023, partially reduced by share issuances, which are reported in other liabilities on the Company's Consolidated Balance",
+      "gold": [
+        {
+          "promise_text_short": "$3.3 billion share repurchase authorization from August 1, 2024 to December 31, 2026",
+          "domain": "Finance",
+          "has_deadline": true
+        }
+      ]
+    },
+    {
+      "id": "E07",
+      "year": 2026,
+      "source": "Notes — $3.3B program remaining at YE 2025",
+      "excerpt": "Equity Repurchase Program In July, 2024, the Board of Directors approved a share repurchase authorization for up to $ 3.3 billion effective from August 1, 2024 to December 31, 2026. As of December 31, 2025, the Company has $ 1.55 billion remaining for equity repurchases under this share repurchase program. The Hartford's previous $ 3.0 billion equity repurchase program authorized by its Board of Directors in August 2022 expired on December 31, 2024. During the year ended December 31, 2025, 2024, and 2023 the Company repurchased $ 1.6 billion ( 12.9 million shares), $ 1.5 billion ( 14.4 million shares) and $ 1.4 billion ( 19.2 million shares), respectively, of common stock under these repurchase programs. During the period from January 1, 2026 through February 19, 2026, the Company repurchased $ 247 ( 1.8 million common shares) under the $ 3.3 billion repurchase program effective from August 1, 2024 to December 31, 2026. The timing of any repurchases of shares is dependent on several factors, including the market price of the Company's securities, the Company's capital position, consideration of the effect of any repurchases on the Company's financial strength or credit ratings, the Company's blackout periods, and other considerations. The Company accrued $ 13 and $ 12 in excise taxes on share repurchases as of December 31, 2025 and 2024 respectively, partially reduced by share issuances, which are reported in other liabilities on the Company's Consolidated Balance Sheets. Preferred Stock The Company has outstanding 13.8 million depositary shares each representing 1/1000th i",
+      "gold": [
+        {
+          "promise_text_short": "$3.3 billion share repurchase authorization through December 31, 2026, $1.55 billion remaining at year-end 2025",
+          "domain": "Finance",
+          "has_deadline": true
+        }
+      ]
+    },
+    {
+      "id": "E08",
+      "year": 2023,
+      "source": "Notes — LDTI adoption expected reserve/AOCI impact",
+      "excerpt": "The Company expects the adoption of the new guidance to result in an increase of approximately $ 85 to the reserve for future policy benefits and a decrease of approximately $ 65 after tax to accumulated other comprehensive income (\"AOCI\") as of the transition date because market upper-medium grade (low-credit-risk) fixed-income investment yields were lower as of the transition date than the locked in rates that were previously used to discount the reserves. An increase in market interest rates since the transition date resulted in a change from an AOCI loss of approximately $ 65 to an AOCI gain of approximately $ 35 as of December 31, 2022. Significant Accounting Policies The Company’s significant accounting policies are as follows: Revenue Recognition Premium Revenue from Direct Insurance and Assumed Reinsurance Property and casualty premiums are earned on a pro rata basis over the policy period and include accruals for policies that have been written by agents but not yet reported to us, as well as ultimate premium revenue anticipated under auditable and 127 | Table of Contents Index to Consolidated Financial Statements and Schedules Note 1 - Basis of Presentation and Significant Accounting Policies THE HARTFORD FINANCIAL SERVICES GROUP, INC. NOTES TO CONSOLIDATED FINANCIAL STATEMENTS (continued) retrospectively rated policies. We estimate the amount of premium not yet reported based on current and historical trends of the business being written. Such estimates are regularly reviewed and updated and any resulting adjustments are included in the current year's results. Un",
+      "gold": [
+        {
+          "promise_text_short": "Expect LDTI adoption to increase future policy benefit reserves by about $85 and decrease AOCI by about $65 after tax at transition",
+          "domain": "Finance",
+          "has_deadline": false
+        }
+      ]
+    },
+    {
+      "id": "E09",
+      "year": 2022,
+      "source": "Notes — LDTI adoption qualitative expectation",
+      "excerpt": "The Company expects the adoption of the new guidance to result in an increase to the reserve for future policy benefits and a corresponding decrease to accumulated other comprehensive income (\"AOCI\") as of the transition date because market upper-medium grade (low-credit-risk) fixed-income investment yields were lower as of the transition date than the locked in rates that were previously used to discount the reserves. The adoption is not expected to have a material effect on the Company’s total liabilities, stockholders’ equity or results of operations. Significant Accounting Policies The Company’s significant accounting policies are as follows: Revenue Recognition Premium Revenue from Direct Insurance and Assumed Reinsurance Property and casualty premiums are earned on a pro rata basis over the policy period and include accruals for policies that have been written by agents but not yet reported to us, as well as ultimate premium revenue anticipated under auditable and retrospectively rated policies. We estimate the amount of premium not yet reported based on current and historical trends of the business being written. Such estimates are regularly reviewed and updated and any resulting adjustments are included in the current year's results. Unearned premiums represent the premiums applicable to the unexpired terms of policies in force, or period of risk. Group life, disability and accident premiums are generally due from policyholders and recognized as revenue on a pro rata basis over the period of the contracts. An estimated ACL is recorded on the basis of periodic evalua",
+      "gold": [
+        {
+          "promise_text_short": "Expect LDTI adoption to increase the reserve for future policy benefits and decrease AOCI at transition, not expected to be material to total liabilities or results",
+          "domain": "Finance",
+          "has_deadline": false
+        }
+      ]
+    },
+    {
+      "id": "E10",
+      "year": 2024,
+      "source": "Notes — restructuring cost expectation ~$126",
+      "excerpt": "Total restructuring and other costs are expected to be approximately $ 126 , before tax, and will be recognized in Corporate for segment reporting. 215 | Index to Consolidated Financial Statements and Schedules Table of Contents Note 23 - Restructuring and Other Costs THE HARTFORD FINANCIAL SERVICES GROUP, INC. NOTES TO CONSOLIDATED FINANCIAL STATEMENTS (continued) Restructuring and Other Costs, Before Tax Incurred in the Year Ended December 31, 2021 Incurred in the Year Ended December 31, 2022 Incurred in the Year Ended December 31, 2023 Cumulative Incurred in the Year Ended December 31, 2023 Total Amount Expected to be Incurred Severance benefits $ ( 25 ) $ ( 7 ) $ ( 6 ) $ 35 $ 35 IT costs 9 8 5 25 25 Professional fees and other expenses 17 12 7 64 66 Total restructuring and other costs, before tax $ 1 $ 13 $ 6 $ 124 $ 126 Accrued Restructuring and Other Costs Year Ended December 31, 2023 Severance Benefits and Related Costs IT Costs Professional Fees and Other Total Restructuring and Other Costs Liability Balance, beginning of period $ 7 $ — $ — $ 7 Incurred ( 6 ) 5 7 6 Payments ( 1 ) ( 5 ) ( 7 ) ( 13 ) Balance, end of period $ — $ — $ — $ — Accrued Restructuring and Other Costs Year Ended December 31, 2022 Severance Benefits and Related Costs IT Costs Professional Fees and Other Total Restructuring and Other Costs Liability Balance, beginning of period $ 18 $ — $ — $ 18 Incurred ( 7 ) 8 12 13 Payments ( 4 ) ( 8 ) ( 12 ) ( 24 ) Balance, end of period $ 7 $ — $ — $ 7 24. QUARTERLY RESULTS (UNAUDITED) On January 1, 2023, the Company adopted the FASB's long-duration targete",
+      "gold": [
+        {
+          "promise_text_short": "Total restructuring and other costs expected to be approximately $126 before tax",
+          "domain": "Operations",
+          "has_deadline": false
+        }
+      ]
+    },
+    {
+      "id": "E11",
+      "year": 2022,
+      "source": "Capital — limited partnership funding commitments",
+      "excerpt": "committed to fund limited partnerships and other alternative investments, which may be called by the partnership during the commitment period to fund the purchase of new investments and partnership expenses. The funding of purchase investments in limited partnerships and other alternative investments are at the discretion of the general partner or manager and may be called at any time. Additionally, $ 185 of the outstanding commitments relate to various funding obligations primarily associated with private debt and equity securities. The remaining outstanding commitments of $ 679 relate to mortgage loans. Of the $ 2.4 billion in total outstanding commitments, $ 382 are related to mortgage loan commitments which the Company can cancel unconditionally. GUARANTY FUNDS AND OTHER INSURANCE-RELATED ASSESSMENTS In all states, insurers licensed to transact certain classes of insurance are required to become members of a guaranty fund. In most states, in the event of the insolvency of an insurer writing any such class of insurance in the state, the guaranty funds may assess its members to pay covered claims of the insolvent insurers. Assessments are based on each member's proportionate share of written premiums in the state for the classes of insurance in which the insolvent insurer was engaged. Assessments are generally limited for any year to one or two percent of the premiums written per year depending on the state. Some states permit member insurers to recover assessments paid through surcharges on policyholders or through full or partial premium tax offsets, while other states",
+      "gold": [
+        {
+          "promise_text_short": "Committed to fund limited partnerships and other alternative investments when called during the commitment period",
+          "domain": "Finance",
+          "has_deadline": false
+        }
+      ]
+    },
+    {
+      "id": "E12",
+      "year": 2026,
+      "source": "Item 1C Cybersecurity — defense-in-depth (ongoing program, not a dated target)",
+      "excerpt": "managing risks. The Hartford employs a ‘defense-in-depth’ strategy that uses multiple security measures to protect the integrity of the Company's information assets. This ‘defense-in-depth’ strategy aligns to the National Institute of Standards and Technology Cybersecurity Framework, where controls are implemented throughout our environments to achieve the six categorical objectives of governance, identification, protection, detection, response and recovery. Our 'defense in depth' program uses several methods to protect against intrusion by a bad actor, including such techniques as reputational filtering, anti-virus scans, intrusion prevention, multi-factor authentication, and account isolation among others. We also use numerous approaches to detect ransomware and other cyber attacks, including, among others, dark web searches, email sandboxing, endpoint detection, and intrusion detection. The Hartford continues to monitor and enhance its framework to respond to evolving cyber threats and regulations for data privacy, including the European Union General Data Protection Regulation, the California Consumer Privacy Act and the New York Department of Financial Services Cybersecurity Regulation. We regularly assess our programs and control environment, leveraging externally conducted cyber tests and evaluations along with internally managed cyber risk assessments and testing. Additionally, the Company collaborates with industry associations, government authorities and external ad",
+      "gold": [
+        {
+          "promise_text_short": "Continue to monitor and enhance cybersecurity framework against evolving threats and privacy regulations",
+          "domain": "Technology",
+          "has_deadline": false
+        }
+      ]
+    },
+    {
+      "id": "E13",
+      "year": 2024,
+      "source": "Item 1C Cybersecurity — CISO/CIO bios (historical, not a commitment)",
+      "excerpt": "Item 1C. Cybersecurity === Both the CIO and the CISO have expertise assessing and managing cybersecurity risks. The CIO has served in her current role since 2019 and served in similar technology leadership roles before her current role. She has eighteen years of executive leadership experience in the financial services industry and twenty-eight years of overall technology experience, during which time she has led large scale business transformation, delivered innovative technology strategies and has overseen and modernized complex technology portfolios. The CISO has held several senior-level information technology roles in his twenty-five-year tenure with the Company and has served in his current role since 2021. In his various roles, he has been responsible for providing senior leadership in the areas of information security, IT governance risk & compliance, business continuity, and disaster recovery. Item 2. PROPERTIES As of December 31, 2023, The Hartford owned building space totaling approximately 1.8 million square feet consisting of its home office complex in Hartford, Connecticut and other properties within the greater Hartford, Connecticut area. In addition, we lease offices throughout North America, the United Kingdom and other overseas locations to house administrative, claims handling, sales and other business operations. As of December 31, 2023, The Hartford leased approximately 935 thousand square feet throughout the United States, 22 thousand square feet in London and 6 thousand square feet in other international branches. All of the properties owned or lease",
+      "gold": []
+    },
+    {
+      "id": "E14",
+      "year": 2022,
+      "source": "Item 9A — definition of internal control (boilerplate, no promise)",
+      "excerpt": "Definition and Limitations of Internal Control over Financial Reporting A company’s internal control over financial reporting is a process designed to provide reasonable assurance regarding the reliability of financial reporting and the preparation of financial statements for external purposes in accordance with generally accepted accounting principles. A company’s internal control over financial reporting includes those policies and procedures that (1) pertain to the maintenance of records that, in reasonable detail, accurately and fairly reflect the transactions and dispositions of the assets of the company; (2) provide reasonable assurance that transactions are recorded as necessary to permit preparation of financial statements in accordance with generally accepted accounting principles, and that receipts and expenditures of the company are being made only in accordance with authorizations of management and directors of the company; and (3) provide reasonable assurance regarding prevention or timely detection of unauthorized acquisition, use, or disposition of the company’s assets that could have a material effect on the financial statements. Because of its inherent limitations, internal control over financial reporting may not prevent or detect misstatements. Also, projections of any evaluation of effectiveness to future periods are subject to the risk that controls may become inadequate because of changes in conditions, or that the degree of compliance with the policies or procedures may deteriorate . /s/ DELOITTE & TOUCHE LLP Hartford, Connecticut February 18, 2022 12",
+      "gold": []
+    },
+    {
+      "id": "E15",
+      "year": 2025,
+      "source": "Item 9A — auditor opinion on ICFR (historical attestation)",
+      "excerpt": "Item 9A. Controls and Procedures === Report of Independent Registered Public Accounting Firm To the Board of Directors and Stockholders of The Hartford Insurance Group, Inc. Hartford, Connecticut Opinion on Internal Control over Financial Reporting We have audited the internal control over financial reporting of The Hartford Insurance Group, Inc. and its subsidiaries (the “Company”) (formerly The Hartford Financial Services Group, Inc.) as of December 31, 2024, based on criteria established in Internal Control — Integrated Framework (2013) issued by the Committee of Sponsoring Organizations of the Treadway Commission (COSO). In our opinion, the Company maintained, in all material respects, effective internal control over financial reporting as of December 31, 2024, based on criteria established in Internal Control — Integrated Framework (2013) issued by COSO. We have also audited, in accordance with the standards of the Public Company Accounting Oversight Board (United States) (PCAOB), the consolidated financial statements as of and for the year ended December 31, 2024, of the Company and our report dated February 21, 2025, expressed an unqualified opinion on those financial statements. Basis for Opinion The Company’s management is responsible for maintaining effective internal control over financial reporting and for its assessment of the effectiveness of internal control over financial reporting, included in the accompanying Management's Annual Report on Internal Control over Financial Reporting. Our responsibility is to express an opinion on the Company’s internal contr",
+      "gold": []
+    },
+    {
+      "id": "E16",
+      "year": 2024,
+      "source": "Schedule III supplementary insurance table",
+      "excerpt": "SUPPLEMENTARY INSURANCE INFORMATION (in millions) Segment Earned Premiums, Fee Income and Other Net Investment Income Benefits, Losses and Loss Adjustment Expenses Amortization of Deferred Policy Acquisition Costs Insurance Operating Costs and Other Expenses [1] Net Written Premiums [2] For the year December 31, 2023 Commercial Lines $ 11,683 $ 1,532 $ 6,786 $ 1,779 $ 1,907 $ 12,279 Personal Lines 3,198 171 2,538 231 638 3,198 Property & Casualty Other Operations — 69 224 — 4 — Group Benefits 6,515 469 4,683 34 1,554 — Hartford Funds 973 17 — — 781 — Corporate 41 47 7 — 273 — Consolidated $ 22,410 $ 2,305 $ 14,238 $ 2,044 $ 5,157 $ 15,477 For the year December 31, 2022 Commercial Lines $ 10,609 $ 1,415 $ 6,169 $ 1,563 $ 1,857 $ 11,158 Personal Lines 3,052 140 2,164 228 652 2,961 Property & Casualty Other Operations — 63 280 — 9 — Group Benefits 6,057 524 4,517 33 1,507 — Hartford Funds 1,044 9 — — 826 — Corporate 50 26 8 — 287 — Consolidated $ 20,812 $ 2,177 $ 13,138 $ 1,824 $ 5,138 $ 14,119 For the year December 31, 2021 Commercial Lines $ 9,586 $ 1,502 $ 6,044 $ 1,398 $ 1,747 $ 10,041 Personal Lines 3,066 157 1,864 230 678 2,908 Property & Casualty Other Operations — 75 202 — 9 — Group Benefits 5,687 550 4,602 40 1,413 — Hartford Funds 1,189 5 — — 925 — Corporate 40 24 8 — 325 — Consolidated $ 19,568 $ 2,313 $ 12,720 $ 1,668 $ 5,097 $ 12,949 [1] Includes interest expense, loss on extinguishment of debt, restructuring and other costs, loss on reinsurance transaction and amortization of intangible assets. [2] Excludes life insurance pursuant to Regulation S-X. 222 | Table o",
+      "gold": []
+    },
+    {
+      "id": "E17",
+      "year": 2026,
+      "source": "Equity rollforward table (historical balances)",
+      "excerpt": "Dividends declared on common stock ( 607 ) ( 566 ) ( 534 ) Retained Earnings, end of period 24,739 21,531 19,007 Treasury Stock, at cost Treasury Stock, at cost, beginning of period ( 3,113 ) ( 1,816 ) ( 1,773 ) Treasury stock acquired ( 1,616 ) ( 1,515 ) ( 1,414 ) Treasury stock retired — — 1,219 Issuance of shares under incentive and stock compensation plans from treasury stock and other 213 305 207 Net shares acquired related to employee incentive and stock compensation plans ( 73 ) ( 87 ) ( 55 ) Treasury Stock, at cost, end of period ( 4,589 ) ( 3,113 ) ( 1,816 ) Accumulated Other Comprehensive Loss, net of tax Accumulated other comprehensive loss, net of tax, beginning of period ( 2,886 ) ( 2,849 ) ( 3,841 ) Total other comprehensive income (loss) 829 ( 37 ) 992 Accumulated other comprehensive loss, net of tax, end of period ( 2,057 ) ( 2,886 ) ( 2,849 ) Total Stockholders’ Equity $ 18,979 $ 16,447 $ 15,327 Preferred Shares Outstanding 13,800 13,800 13,800 Common Shares Outstanding (in thousands) Common Shares Outstanding, beginning of period 287,556 298,472 315,111 Treasury stock acquired ( 12,943 ) ( 14,443 ) ( 19,238 ) Issuance of shares under incentive and stock compensation plans and other 2,950 4,427 3,299 Return of shares under incentive and stock compensation plans to treasury stock ( 640 ) ( 900 ) ( 700 ) Common Shares Outstanding, end of period 276,923 287,556 298,472 Cash dividends declared per common share $ 2.160 $ 1.930 $ 1.745 Cash dividends declared per preferred share $ 1,500.00 $ 1,500.00 $ 1,500.00 See Notes to Consolidated Financial Statements. 126",
+      "gold": []
+    },
+    {
+      "id": "E18",
+      "year": 2023,
+      "source": "Available Information website boilerplate",
+      "excerpt": "AVAILABLE INFORMATION The Company’s Internet address is www.thehartford.com. Our annual report on Form 10-K, quarterly reports on Form 10-Q, current reports on Form 8-K, and amendments to those reports are available, without charge, on the investor relations section of our website, https://ir.thehartford.com, as soon as reasonably practicable after they are electronically filed with, or furnished to, the SEC. Reports filed with the SEC may be viewed at www.sec.gov. References in this report to our website address are provided only as a convenience and do not constitute, and should not be viewed as, an incorporation by reference of the information contained on, or available through, the website. Therefore, such information should not be considered part of this report. 20 | Table of Contents === Item I - - Item 1A. Risk Factors === judicial or legislative developments could adversely affect The Hartford’s business, financial condition, results of operations or liquidity. Changes in federal, state or foreign tax laws could adversely affect our business, financial condition, results of operations or liquidity. Changes in federal, state or foreign tax laws and tax rates or regulations could have a material adverse effect on our profitability or financial condition by increasing the Company's overall tax and compliance burdens. The Company’s federal and state tax returns reflect certain items such as tax-exempt bond interest, tax credits, and insurance reserve deductions. There is an increasing risk that, in the context of tax reform in the U.S., federal and/or state tax legisl",
+      "gold": []
+    },
+    {
+      "id": "E19",
+      "year": 2024,
+      "source": "Timing of remaining repurchases is conditional (vague; program already labeled in E05)",
+      "excerpt": "The timing of any repurchases of shares under the remaining equity repurchase authorization is dependent upon several factors, including the market price of the Company's securities, the Company's capital position, consideration of the effect of any repurchases on the Company's financial strength or credit ratings, the Company's blackout periods, and other considerations. As of December 31, 2023, the Company accrued $ 12 in excise taxes on share repurchases, partially reduced by share issuances, which are reported in other liabilities on the Company's Consolidated Balance Sheets. Preferred Stock The Company has outstanding 13.8 million depositary shares each representing 1/1000th interest in a share of the Company’s 6.0% Series G non-cumulative perpetual preferred stock (“Preferred Stock”) with a liquidation preference of $ 25,000 per share (equivalent to $ 25.00 per depositary share). The Preferred Stock is perpetual and has no maturity date. Dividends are recorded when declared. Dividends are payable, if declared, quarterly in arrears on the 15th day of February, May, August and November of each year. If a dividend is not declared and paid or made payable on all outstanding shares of the Preferred Stock for the latest completed dividend period, no dividends may be paid or declared on The Hartford’s common stock and The Hartford may not purchase, redeem, or otherwise acquire its common stock. The Preferred Stock is redeemable at the Company’s option in whole or in part, at a redemption price of $ 25,000 per share, plus unpaid dividends attributable to the current dividend",
+      "gold": [
+        {
+          "promise_text_short": "May repurchase remaining authorized shares depending on price, capital, ratings, and blackout periods",
+          "domain": "Finance",
+          "has_deadline": false
+        }
+      ]
+    },
+    {
+      "id": "E20",
+      "year": 2023,
+      "source": "Intangible-asset amortization boilerplate (not a management business commitment)",
+      "excerpt": "will continue to have value. Indefinite-lived intangible assets are not subject to amortization. Intangible assets are assessed for impairment generally when events or circumstances indicate a potential impairment and at least annually for indefinite-lived intangibles. Finite-lived intangible assets are impaired if the carrying amount is not recoverable from undiscounted cash flows. Indefinite-lived intangible assets are impaired if the carrying amount exceeds fair value. Impaired intangible assets are written down to fair value. Property and Equipment Property and equipment, which includes capitalized software and right-of-use lease assets, is carried at cost net of accumulated depreciation. Depreciation is based on the estimated useful lives of the various classes of property and equipment and is recognized principally on the straight-line method. Accumulated depreciation was $ 2.3 billion and $ 2.3 billion as of December 31, 2022 and 2021, respectively. Depreciation expense was $ 213 , $ 282 , and $ 271 for the years ended December 31, 2022, 2021 and 2020, respectively, and is reported in insurance operating costs and other expenses. The costs to access and develop hosted software arrangements, where The Hartford has the right to access and use the software, but not take possession, and the cost of certain software licenses are reported in other assets on a straight-line basis over the service period. Amortization of hosted software and certain software licenses was $ 78 , $ 60 , and $ 42 for the years ended December 31, 2022, 2021, and 2020, respectively, and is reporte",
+      "gold": []
+    }
+  ],
+  "judge_gold": [
+    {
+      "id": "J01",
+      "promise_text": "Board-approved $3.0 billion share repurchase authorization effective August 1, 2022 through December 31, 2024.",
+      "year_made": 2023,
+      "domain": "Finance",
+      "deadline_mentioned": "December 31, 2024",
+      "evidence_excerpt": "Equity Repurchase Program In July, 2022, the Board of Directors approved a share repurchase authorization for up to $ 3.0 billion effective from August 1, 2022 to December 31, 2024. As of December 31, 2023, the Company has $ 1.35 billion remaining for equity repurchases under this share repurchase program. During the year ended December 31, 2023 the Company repurchased $ 1.4 billion ( 19.2 million shares) under this repurchase program. The Hartford's $ 3.0 billion equity repurchase program authorized by its Board of Directors in December 2020 expired on December 31, 2022. During the years ended December 31, 2022 and 2021, the Company repurchased $ 1.6 billion ( 22.3 million shares) and $ 1.7 billion ( 25.9 million shares), respectively, of common stock under these repurchase programs. During the period from January 1, 2024 through February 22, 2024, the Company repurchased $ 200 ( 2.3 million shares). The timing of any repurchases of shares under the remaining equity repurchase authorization is dependent upon several factors, including the market price of the Company's securities, the Company's capital position, consideration of the effect of any repurchases on the Company's financial strength or credit ratings, the Company's blackout periods, and other considerations. As of December 31, 2023, the Company accrued $ 12 in excise taxes on share repurchases, partially reduced by share issuances, which are reported in other liabilities on the Company's Consolidated Balance Sheets. Preferred Stock The Company has outstanding 13.8 million depositary shares each representing 1/100",
+      "evidence_year": 2024,
+      "gold_status": "Pending",
+      "gold_score_band": "61-85",
+      "notes": "Deadline still in the future as of YE 2023; $1.4B executed in 2023 and $1.35B remaining is progress, not completion."
+    },
+    {
+      "id": "J02",
+      "promise_text": "Board-approved $3.0 billion share repurchase authorization effective August 1, 2022 through December 31, 2024.",
+      "year_made": 2023,
+      "domain": "Finance",
+      "deadline_mentioned": "December 31, 2024",
+      "evidence_excerpt": "Equity Repurchase Program In July, 2024, the Board of Directors approved a share repurchase authorization for up to $ 3.3 billion effective from August 1, 2024 to December 31, 2026. As of December 31, 2024, the Company has $ 3.15 billion remaining for equity repurchases under this share repurchase program. The Hartford's $ 3.0 billion equity repurchase program authorized by its Board of Directors in August 2022, expired on December 31, 2024. The Hartford's previous $ 3.0 billion equity repurchase program authorized by its Board of Directors in December 2020 expired on December 31, 2022. During the year ended December 31, 2024, 2023, and 2022 the Company repurchased $ 1.5 billion ( 14.4 million shares), $ 1.4 billion ( 19.2 million shares) and $ 1.6 billion ( 22.3 million shares), respectively, of common stock under these repurchase programs. During the period from January 1, 2025 through February 20, 2025, the Company repurchased $ 248 ( 2.2 million shares) under the $ 3.3 billion repurchase program effective from August 1, 2024 to December 31, 2026. The timing of any repurchases of shares is dependent on several factors, including the market price of the Company's securities, the Company's capital position, consideration of the effect of any repurchases on the Company's financial strength or credit ratings, the Company's blackout periods, and other considerations. The Company accrued $ 12 in excise taxes on share repurchases as of December 31, 2024 and 2023, partially reduced by share issuances, which are reported in other liabilities on the Company's Consolidated Balance",
+      "evidence_year": 2025,
+      "gold_status": "Delivered",
+      "gold_score_band": "86-100",
+      "notes": "2025 10-K: August 2022 $3.0B program expired December 31, 2024; 2024/2023/2022 buybacks of $1.5B/$1.4B/$1.6B show the authorization was used through expiry."
+    },
+    {
+      "id": "J03",
+      "promise_text": "$3.3 billion share repurchase authorization effective August 1, 2024 through December 31, 2026.",
+      "year_made": 2025,
+      "domain": "Finance",
+      "deadline_mentioned": "December 31, 2026",
+      "evidence_excerpt": "Equity Repurchase Program In July, 2024, the Board of Directors approved a share repurchase authorization for up to $ 3.3 billion effective from August 1, 2024 to December 31, 2026. As of December 31, 2025, the Company has $ 1.55 billion remaining for equity repurchases under this share repurchase program. The Hartford's previous $ 3.0 billion equity repurchase program authorized by its Board of Directors in August 2022 expired on December 31, 2024. During the year ended December 31, 2025, 2024, and 2023 the Company repurchased $ 1.6 billion ( 12.9 million shares), $ 1.5 billion ( 14.4 million shares) and $ 1.4 billion ( 19.2 million shares), respectively, of common stock under these repurchase programs. During the period from January 1, 2026 through February 19, 2026, the Company repurchased $ 247 ( 1.8 million common shares) under the $ 3.3 billion repurchase program effective from August 1, 2024 to December 31, 2026. The timing of any repurchases of shares is dependent on several factors, including the market price of the Company's securities, the Company's capital position, consideration of the effect of any repurchases on the Company's financial strength or credit ratings, the Company's blackout periods, and other considerations. The Company accrued $ 13 and $ 12 in excise taxes on share repurchases as of December 31, 2025 and 2024 respectively, partially reduced by share issuances, which are reported in other liabilities on the Company's Consolidated Balance Sheets. Preferred Stock The Company has outstanding 13.8 million depositary shares each representing 1/1000th i",
+      "evidence_year": 2026,
+      "gold_status": "Pending",
+      "gold_score_band": "61-85",
+      "notes": "Deadline 2026 not reached; $1.55B remaining at YE 2025 after $1.6B of 2025 repurchases."
+    },
+    {
+      "id": "J04",
+      "promise_text": "$3.0 billion aggregate equity repurchase authorization through December 31, 2022.",
+      "year_made": 2022,
+      "domain": "Finance",
+      "deadline_mentioned": "December 31, 2022",
+      "evidence_excerpt": "Equity Repurchase Program In July, 2022, the Board of Directors approved a share repurchase authorization for up to $ 3.0 billion effective from August 1, 2022 to December 31, 2024. As of December 31, 2022, the Company has $ 2.75 billion remaining for equity repurchases under this share repurchase program. The Hartford's $ 3.0 billion equity repurchase program authorized by its Board of Directors in December 2020, expired on December 31, 2022. During the year ended December 31, 2022 and 2021, the Company repurchased $ 1.6 billion ( 22.3 million shares) and $ 1.7 billion ( 25.9 million shares), respectively, of common stock under these repurchase programs. During the period from January 1, 2023 through February 23, 2023, the Company repurchased $ 209 ( 2.7 million shares) under these repurchase programs. The timing of any repurchases of shares under the remaining equity repurchase authorization is dependent upon several factors, including the market price of the Company's securities, the Company's capital position, consideration of the effect of any repurchases on the Company's financial strength or credit ratings, the Company's blackout periods, and other considerations. Under The Hartford’s previous $ 1.0 billion share repurchase program authorized by its Board of Directors in February 2019 and which expired on December 31, 2020, the Company repurchased 2.7 million shares for $ 150 during the year ended 2020. Preferred Stock The Company has outstanding 13.8 million depositary shares each representing 1/1000th interest in a share of the Company’s 6.0% Series G non-cumulativ",
+      "evidence_year": 2023,
+      "gold_status": "Delivered",
+      "gold_score_band": "86-100",
+      "notes": "Subsequent filing states the December 2020 $3.0B program expired December 31, 2022 with $1.6B (2022) and $1.7B (2021) of repurchases."
+    },
+    {
+      "id": "J05",
+      "promise_text": "The Hartford's 2022 Sustainability Report is expected to be published following the Company's annual meeting in May 2023.",
+      "year_made": 2023,
+      "domain": "Operations",
+      "deadline_mentioned": "May 2023",
+      "evidence_excerpt": "SUPPLEMENTARY INSURANCE INFORMATION (in millions) Segment Earned Premiums, Fee Income and Other Net Investment Income Benefits, Losses and Loss Adjustment Expenses Amortization of Deferred Policy Acquisition Costs Insurance Operating Costs and Other Expenses [1] Net Written Premiums [2] For the year December 31, 2023 Commercial Lines $ 11,683 $ 1,532 $ 6,786 $ 1,779 $ 1,907 $ 12,279 Personal Lines 3,198 171 2,538 231 638 3,198 Property & Casualty Other Operations — 69 224 — 4 — Group Benefits 6,515 469 4,683 34 1,554 — Hartford Funds 973 17 — — 781 — Corporate 41 47 7 — 273 — Consolidated $ 22,410 $ 2,305 $ 14,238 $ 2,044 $ 5,157 $ 15,477 For the year December 31, 2022 Commercial Lines $ 10,609 $ 1,415 $ 6,169 $ 1,563 $ 1,857 $ 11,158 Personal Lines 3,052 140 2,164 228 652 2,961 Property & Casualty Other Operations — 63 280 — 9 — Group Benefits 6,057 524 4,517 33 1,507 — Hartford Funds 1,044 9 — — 826 — Corporate 50 26 8 — 287 — Consolidated $ 20,812 $ 2,177 $ 13,138 $ 1,824 $ 5,138 $ 14,119 For the year December 31, 2021 Commercial Lines $ 9,586 $ 1,502 $ 6,044 $ 1,398 $ 1,747 $ 10,041 Personal Lines 3,066 157 1,864 230 678 2,908 Property & Casualty Other Operations — 75 202 — 9 — Group Benefits 5,687 550 4,602 40 1,413 — Hartford Funds 1,189 5 — — 925 — Corporate 40 24 8 — 325 — Consolidated $ 19,568 $ 2,313 $ 12,720 $ 1,668 $ 5,097 $ 12,949 [1] Includes interest expense, loss on extinguishment of debt, restructuring and other costs, loss on reinsurance transaction and amortization of intangible assets. [2] Excludes life insurance pursuant to Regulation S-X. 222 | Table o",
+      "evidence_year": 2024,
+      "gold_status": "Silently Abandoned",
+      "gold_score_band": "0-30",
+      "notes": "May 2023 deadline has passed relative to the 2024 10-K; this Schedule III excerpt does not mention the Sustainability Report."
+    },
+    {
+      "id": "J06",
+      "promise_text": "Total restructuring and other costs are expected to be approximately $126 before tax.",
+      "year_made": 2024,
+      "domain": "Operations",
+      "deadline_mentioned": null,
+      "evidence_excerpt": "Total restructuring and other costs are expected to be approximately $ 126 , before tax, and will be recognized in Corporate for segment reporting. 215 | Index to Consolidated Financial Statements and Schedules Table of Contents Note 23 - Restructuring and Other Costs THE HARTFORD FINANCIAL SERVICES GROUP, INC. NOTES TO CONSOLIDATED FINANCIAL STATEMENTS (continued) Restructuring and Other Costs, Before Tax Incurred in the Year Ended December 31, 2021 Incurred in the Year Ended December 31, 2022 Incurred in the Year Ended December 31, 2023 Cumulative Incurred in the Year Ended December 31, 2023 Total Amount Expected to be Incurred Severance benefits $ ( 25 ) $ ( 7 ) $ ( 6 ) $ 35 $ 35 IT costs 9 8 5 25 25 Professional fees and other expenses 17 12 7 64 66 Total restructuring and other costs, before tax $ 1 $ 13 $ 6 $ 124 $ 126 Accrued Restructuring and Other Costs Year Ended December 31, 2023 Severance Benefits and Related Costs IT Costs Professional Fees and Other Total Restructuring and Other Costs Liability Balance, beginning of period $ 7 $ — $ — $ 7 Incurred ( 6 ) 5 7 6 Payments ( 1 ) ( 5 ) ( 7 ) ( 13 ) Balance, end of period $ — $ — $ — $ — Accrued Restructuring and Other Costs Year Ended December 31, 2022 Severance Benefits and Related Costs IT Costs Professional Fees and Other Total Restructuring and Other Costs Liability Balance, beginning of period $ 18 $ — $ — $ 18 Incurred ( 7 ) 8 12 13 Payments ( 4 ) ( 8 ) ( 12 ) ( 24 ) Balance, end of period $ 7 $ — $ — $ 7 24. QUARTERLY RESULTS (UNAUDITED) On January 1, 2023, the Company adopted the FASB's long-duration targete",
+      "evidence_year": 2024,
+      "gold_status": "Partial",
+      "gold_score_band": "61-85",
+      "notes": "Same-year table shows cumulative incurred $124 vs $126 expected — nearly complete, not an independent later-year confirmation."
+    },
+    {
+      "id": "J07",
+      "promise_text": "Expect LDTI adoption to increase the reserve for future policy benefits by approximately $85 and decrease AOCI by approximately $65 after tax at the transition date.",
+      "year_made": 2023,
+      "domain": "Finance",
+      "deadline_mentioned": null,
+      "evidence_excerpt": "SUPPLEMENTARY INSURANCE INFORMATION (in millions) Segment Earned Premiums, Fee Income and Other Net Investment Income Benefits, Losses and Loss Adjustment Expenses Amortization of Deferred Policy Acquisition Costs Insurance Operating Costs and Other Expenses [1] Net Written Premiums [2] For the year December 31, 2023 Commercial Lines $ 11,683 $ 1,532 $ 6,786 $ 1,779 $ 1,907 $ 12,279 Personal Lines 3,198 171 2,538 231 638 3,198 Property & Casualty Other Operations — 69 224 — 4 — Group Benefits 6,515 469 4,683 34 1,554 — Hartford Funds 973 17 — — 781 — Corporate 41 47 7 — 273 — Consolidated $ 22,410 $ 2,305 $ 14,238 $ 2,044 $ 5,157 $ 15,477 For the year December 31, 2022 Commercial Lines $ 10,609 $ 1,415 $ 6,169 $ 1,563 $ 1,857 $ 11,158 Personal Lines 3,052 140 2,164 228 652 2,961 Property & Casualty Other Operations — 63 280 — 9 — Group Benefits 6,057 524 4,517 33 1,507 — Hartford Funds 1,044 9 — — 826 — Corporate 50 26 8 — 287 — Consolidated $ 20,812 $ 2,177 $ 13,138 $ 1,824 $ 5,138 $ 14,119 For the year December 31, 2021 Commercial Lines $ 9,586 $ 1,502 $ 6,044 $ 1,398 $ 1,747 $ 10,041 Personal Lines 3,066 157 1,864 230 678 2,908 Property & Casualty Other Operations — 75 202 — 9 — Group Benefits 5,687 550 4,602 40 1,413 — Hartford Funds 1,189 5 — — 925 — Corporate 40 24 8 — 325 — Consolidated $ 19,568 $ 2,313 $ 12,720 $ 1,668 $ 5,097 $ 12,949 [1] Includes interest expense, loss on extinguishment of debt, restructuring and other costs, loss on reinsurance transaction and amortization of intangible assets. [2] Excludes life insurance pursuant to Regulation S-X. 222 | Table o",
+      "evidence_year": 2024,
+      "gold_status": "Silently Abandoned",
+      "gold_score_band": "0-30",
+      "notes": "Premium/NII schedule does not confirm the LDTI transition amounts; no matching metrics in this evidence."
+    },
+    {
+      "id": "J08",
+      "promise_text": "2021 performance share awards include a modifier tied to year-end 2023 workforce representation goals for women and people of color in executive roles.",
+      "year_made": 2023,
+      "domain": "Operations",
+      "deadline_mentioned": "year-end 2023",
+      "evidence_excerpt": "Item 9A. Controls and Procedures === Report of Independent Registered Public Accounting Firm To the Board of Directors and Stockholders of The Hartford Insurance Group, Inc. Hartford, Connecticut Opinion on Internal Control over Financial Reporting We have audited the internal control over financial reporting of The Hartford Insurance Group, Inc. and its subsidiaries (the “Company”) (formerly The Hartford Financial Services Group, Inc.) as of December 31, 2024, based on criteria established in Internal Control — Integrated Framework (2013) issued by the Committee of Sponsoring Organizations of the Treadway Commission (COSO). In our opinion, the Company maintained, in all material respects, effective internal control over financial reporting as of December 31, 2024, based on criteria established in Internal Control — Integrated Framework (2013) issued by COSO. We have also audited, in accordance with the standards of the Public Company Accounting Oversight Board (United States) (PCAOB), the consolidated financial statements as of and for the year ended December 31, 2024, of the Company and our report dated February 21, 2025, expressed an unqualified opinion on those financial statements. Basis for Opinion The Company’s management is responsible for maintaining effective internal control over financial reporting and for its assessment of the effectiveness of internal control over financial reporting, included in the accompanying Management's Annual Report on Internal Control over Financial Reporting. Our responsibility is to express an opinion on the Company’s internal contr",
+      "evidence_year": 2025,
+      "gold_status": "Silently Abandoned",
+      "gold_score_band": "0-30",
+      "notes": "Auditor ICFR opinion does not mention representation-goal outcomes after the 2023 deadline."
+    },
+    {
+      "id": "J09",
+      "promise_text": "Continue progress toward the Company's 2030 representation goals via performance-share modifiers on 2024 and 2027 awards.",
+      "year_made": 2023,
+      "domain": "Operations",
+      "deadline_mentioned": "2030",
+      "evidence_excerpt": "Dividends declared on common stock ( 607 ) ( 566 ) ( 534 ) Retained Earnings, end of period 24,739 21,531 19,007 Treasury Stock, at cost Treasury Stock, at cost, beginning of period ( 3,113 ) ( 1,816 ) ( 1,773 ) Treasury stock acquired ( 1,616 ) ( 1,515 ) ( 1,414 ) Treasury stock retired — — 1,219 Issuance of shares under incentive and stock compensation plans from treasury stock and other 213 305 207 Net shares acquired related to employee incentive and stock compensation plans ( 73 ) ( 87 ) ( 55 ) Treasury Stock, at cost, end of period ( 4,589 ) ( 3,113 ) ( 1,816 ) Accumulated Other Comprehensive Loss, net of tax Accumulated other comprehensive loss, net of tax, beginning of period ( 2,886 ) ( 2,849 ) ( 3,841 ) Total other comprehensive income (loss) 829 ( 37 ) 992 Accumulated other comprehensive loss, net of tax, end of period ( 2,057 ) ( 2,886 ) ( 2,849 ) Total Stockholders’ Equity $ 18,979 $ 16,447 $ 15,327 Preferred Shares Outstanding 13,800 13,800 13,800 Common Shares Outstanding (in thousands) Common Shares Outstanding, beginning of period 287,556 298,472 315,111 Treasury stock acquired ( 12,943 ) ( 14,443 ) ( 19,238 ) Issuance of shares under incentive and stock compensation plans and other 2,950 4,427 3,299 Return of shares under incentive and stock compensation plans to treasury stock ( 640 ) ( 900 ) ( 700 ) Common Shares Outstanding, end of period 276,923 287,556 298,472 Cash dividends declared per common share $ 2.160 $ 1.930 $ 1.745 Cash dividends declared per preferred share $ 1,500.00 $ 1,500.00 $ 1,500.00 See Notes to Consolidated Financial Statements. 126",
+      "evidence_year": 2026,
+      "gold_status": "Pending",
+      "gold_score_band": "31-60",
+      "notes": "2030 deadline not reached; equity rollforward is not evidence of representation progress — treat as pending with weak evidence, not abandoned."
+    },
+    {
+      "id": "J10",
+      "promise_text": "The Hartford will modernize its claims platform and cut claims cycle time 40% by 2024.",
+      "year_made": 2022,
+      "domain": "Claims",
+      "deadline_mentioned": "2024",
+      "evidence_excerpt": "Item 9A. Controls and Procedures === Report of Independent Registered Public Accounting Firm To the Board of Directors and Stockholders of The Hartford Insurance Group, Inc. Hartford, Connecticut Opinion on Internal Control over Financial Reporting We have audited the internal control over financial reporting of The Hartford Insurance Group, Inc. and its subsidiaries (the “Company”) (formerly The Hartford Financial Services Group, Inc.) as of December 31, 2024, based on criteria established in Internal Control — Integrated Framework (2013) issued by the Committee of Sponsoring Organizations of the Treadway Commission (COSO). In our opinion, the Company maintained, in all material respects, effective internal control over financial reporting as of December 31, 2024, based on criteria established in Internal Control — Integrated Framework (2013) issued by COSO. We have also audited, in accordance with the standards of the Public Company Accounting Oversight Board (United States) (PCAOB), the consolidated financial statements as of and for the year ended December 31, 2024, of the Company and our report dated February 21, 2025, expressed an unqualified opinion on those financial statements. Basis for Opinion The Company’s management is responsible for maintaining effective internal control over financial reporting and for its assessment of the effectiveness of internal control over financial reporting, included in the accompanying Management's Annual Report on Internal Control over Financial Reporting. Our responsibility is to express an opinion on the Company’s internal contr",
+      "evidence_year": 2025,
+      "gold_status": "Silently Abandoned",
+      "gold_score_band": "0-30",
+      "notes": "Synthetic over-precise promise not supported in later ICFR text (negative control: do not invent delivery)."
+    },
+    {
+      "id": "J11",
+      "promise_text": "Maintain a defense-in-depth cybersecurity program aligned to the NIST Cybersecurity Framework.",
+      "year_made": 2026,
+      "domain": "Technology",
+      "deadline_mentioned": null,
+      "evidence_excerpt": "managing risks. The Hartford employs a ‘defense-in-depth’ strategy that uses multiple security measures to protect the integrity of the Company's information assets. This ‘defense-in-depth’ strategy aligns to the National Institute of Standards and Technology Cybersecurity Framework, where controls are implemented throughout our environments to achieve the six categorical objectives of governance, identification, protection, detection, response and recovery. Our 'defense in depth' program uses several methods to protect against intrusion by a bad actor, including such techniques as reputational filtering, anti-virus scans, intrusion prevention, multi-factor authentication, and account isolation among others. We also use numerous approaches to detect ransomware and other cyber attacks, including, among others, dark web searches, email sandboxing, endpoint detection, and intrusion detection. The Hartford continues to monitor and enhance its framework to respond to evolving cyber threats and regulations for data privacy, including the European Union General Data Protection Regulation, the California Consumer Privacy Act and the New York Department of Financial Services Cybersecurity Regulation. We regularly assess our programs and control environment, leveraging externally conducted cyber tests and evaluations along with internally managed cyber risk assessments and testing. Additionally, the Company collaborates with industry associations, government authorities and external ad",
+      "evidence_year": 2026,
+      "gold_status": "Delivered",
+      "gold_score_band": "86-100",
+      "notes": "Same-period Item 1C describes the program, NIST alignment, monitoring, and testing — ongoing operational commitment evidenced in-place."
+    },
+    {
+      "id": "J12",
+      "promise_text": "$3.3 billion share repurchase authorization from August 1, 2024 to December 31, 2026.",
+      "year_made": 2025,
+      "domain": "Finance",
+      "deadline_mentioned": "December 31, 2026",
+      "evidence_excerpt": "Definition and Limitations of Internal Control over Financial Reporting A company’s internal control over financial reporting is a process designed to provide reasonable assurance regarding the reliability of financial reporting and the preparation of financial statements for external purposes in accordance with generally accepted accounting principles. A company’s internal control over financial reporting includes those policies and procedures that (1) pertain to the maintenance of records that, in reasonable detail, accurately and fairly reflect the transactions and dispositions of the assets of the company; (2) provide reasonable assurance that transactions are recorded as necessary to permit preparation of financial statements in accordance with generally accepted accounting principles, and that receipts and expenditures of the company are being made only in accordance with authorizations of management and directors of the company; and (3) provide reasonable assurance regarding prevention or timely detection of unauthorized acquisition, use, or disposition of the company’s assets that could have a material effect on the financial statements. Because of its inherent limitations, internal control over financial reporting may not prevent or detect misstatements. Also, projections of any evaluation of effectiveness to future periods are subject to the risk that controls may become inadequate because of changes in conditions, or that the degree of compliance with the policies or procedures may deteriorate . /s/ DELOITTE & TOUCHE LLP Hartford, Connecticut February 18, 2022 12",
+      "evidence_year": 2022,
+      "gold_status": "Silently Abandoned",
+      "gold_score_band": "0-30",
+      "notes": "Wrong-year boilerplate ICFR text; no repurchase evidence. (If a model marks Pending solely because 2026 is in the future, that is a near-miss vs this gold.)"
+    },
+    {
+      "id": "J13",
+      "promise_text": "Committed to fund limited partnerships and other alternative investments when called during the commitment period.",
+      "year_made": 2022,
+      "domain": "Finance",
+      "deadline_mentioned": null,
+      "evidence_excerpt": "committed to fund limited partnerships and other alternative investments, which may be called by the partnership during the commitment period to fund the purchase of new investments and partnership expenses. The funding of purchase investments in limited partnerships and other alternative investments are at the discretion of the general partner or manager and may be called at any time. Additionally, $ 185 of the outstanding commitments relate to various funding obligations primarily associated with private debt and equity securities. The remaining outstanding commitments of $ 679 relate to mortgage loans. Of the $ 2.4 billion in total outstanding commitments, $ 382 are related to mortgage loan commitments which the Company can cancel unconditionally. GUARANTY FUNDS AND OTHER INSURANCE-RELATED ASSESSMENTS In all states, insurers licensed to transact certain classes of insurance are required to become members of a guaranty fund. In most states, in the event of the insolvency of an insurer writing any such class of insurance in the state, the guaranty funds may assess its members to pay covered claims of the insolvent insurers. Assessments are based on each member's proportionate share of written premiums in the state for the classes of insurance in which the insolvent insurer was engaged. Assessments are generally limited for any year to one or two percent of the premiums written per year depending on the state. Some states permit member insurers to recover assessments paid through surcharges on policyholders or through full or partial premium tax offsets, while other states",
+      "evidence_year": 2022,
+      "gold_status": "Pending",
+      "gold_score_band": "31-60",
+      "notes": "Open-ended funding commitment still outstanding; same-year description of outstanding calls is not completion."
+    },
+    {
+      "id": "J14",
+      "promise_text": "Company may repurchase remaining authorized shares depending on market price, capital position, ratings, and blackout periods.",
+      "year_made": 2024,
+      "domain": "Finance",
+      "deadline_mentioned": null,
+      "evidence_excerpt": "Equity Repurchase Program In July, 2024, the Board of Directors approved a share repurchase authorization for up to $ 3.3 billion effective from August 1, 2024 to December 31, 2026. As of December 31, 2025, the Company has $ 1.55 billion remaining for equity repurchases under this share repurchase program. The Hartford's previous $ 3.0 billion equity repurchase program authorized by its Board of Directors in August 2022 expired on December 31, 2024. During the year ended December 31, 2025, 2024, and 2023 the Company repurchased $ 1.6 billion ( 12.9 million shares), $ 1.5 billion ( 14.4 million shares) and $ 1.4 billion ( 19.2 million shares), respectively, of common stock under these repurchase programs. During the period from January 1, 2026 through February 19, 2026, the Company repurchased $ 247 ( 1.8 million common shares) under the $ 3.3 billion repurchase program effective from August 1, 2024 to December 31, 2026. The timing of any repurchases of shares is dependent on several factors, including the market price of the Company's securities, the Company's capital position, consideration of the effect of any repurchases on the Company's financial strength or credit ratings, the Company's blackout periods, and other considerations. The Company accrued $ 13 and $ 12 in excise taxes on share repurchases as of December 31, 2025 and 2024 respectively, partially reduced by share issuances, which are reported in other liabilities on the Company's Consolidated Balance Sheets. Preferred Stock The Company has outstanding 13.8 million depositary shares each representing 1/1000th i",
+      "evidence_year": 2026,
+      "gold_status": "Partial",
+      "gold_score_band": "61-85",
+      "notes": "Later filings show continued repurchases but restated that timing remains conditional — discretionary language, not a hard target."
+    },
+    {
+      "id": "J15",
+      "promise_text": "Publish 10-K, 10-Q, and 8-K filings on the investor-relations website as soon as reasonably practicable after SEC filing.",
+      "year_made": 2023,
+      "domain": "Operations",
+      "deadline_mentioned": null,
+      "evidence_excerpt": "Item 9A. Controls and Procedures === Report of Independent Registered Public Accounting Firm To the Board of Directors and Stockholders of The Hartford Insurance Group, Inc. Hartford, Connecticut Opinion on Internal Control over Financial Reporting We have audited the internal control over financial reporting of The Hartford Insurance Group, Inc. and its subsidiaries (the “Company”) (formerly The Hartford Financial Services Group, Inc.) as of December 31, 2024, based on criteria established in Internal Control — Integrated Framework (2013) issued by the Committee of Sponsoring Organizations of the Treadway Commission (COSO). In our opinion, the Company maintained, in all material respects, effective internal control over financial reporting as of December 31, 2024, based on criteria established in Internal Control — Integrated Framework (2013) issued by COSO. We have also audited, in accordance with the standards of the Public Company Accounting Oversight Board (United States) (PCAOB), the consolidated financial statements as of and for the year ended December 31, 2024, of the Company and our report dated February 21, 2025, expressed an unqualified opinion on those financial statements. Basis for Opinion The Company’s management is responsible for maintaining effective internal control over financial reporting and for its assessment of the effectiveness of internal control over financial reporting, included in the accompanying Management's Annual Report on Internal Control over Financial Reporting. Our responsibility is to express an opinion on the Company’s internal contr",
+      "evidence_year": 2025,
+      "gold_status": "Pending",
+      "gold_score_band": "31-60",
+      "notes": "Ongoing disclosure practice; ICFR opinion is not website-posting evidence. Do not score Delivered from unrelated auditor language."
+    }
+  ],
+  "qa_gold": [
+    {
+      "id": "Q01",
+      "question": "What share-repurchase authorization did The Hartford approve in July 2022, and when did it expire?",
+      "relevant_year": 2023,
+      "relevant_section_hint": "Item 7 MD&A / notes — Equity Repurchase Program"
+    },
+    {
+      "id": "Q02",
+      "question": "How much of the July 2022 $3.0 billion repurchase authorization remained as of December 31, 2023?",
+      "relevant_year": 2024,
+      "relevant_section_hint": "Equity Repurchase Program note"
+    },
+    {
+      "id": "Q03",
+      "question": "What new repurchase authorization was approved in July 2024 and through what date is it effective?",
+      "relevant_year": 2025,
+      "relevant_section_hint": "Equity Repurchase Program note"
+    },
+    {
+      "id": "Q04",
+      "question": "How much repurchase capacity remained under the $3.3 billion program at year-end 2025?",
+      "relevant_year": 2026,
+      "relevant_section_hint": "Equity Repurchase Program note"
+    },
+    {
+      "id": "Q05",
+      "question": "What year-end 2023 representation goals were tied to 2021 performance share awards?",
+      "relevant_year": 2023,
+      "relevant_section_hint": "Item 1 Business — Diversity, Equity and Inclusion"
+    },
+    {
+      "id": "Q06",
+      "question": "When did The Hartford say the 2022 Sustainability Report would be published?",
+      "relevant_year": 2023,
+      "relevant_section_hint": "Item 1 Business — human capital / sustainability"
+    },
+    {
+      "id": "Q07",
+      "question": "What reserve and AOCI impact did management expect from adopting the new long-duration insurance guidance?",
+      "relevant_year": 2023,
+      "relevant_section_hint": "Notes — significant accounting policies / future policy benefits"
+    },
+    {
+      "id": "Q08",
+      "question": "What total restructuring and other costs did The Hartford expect, before tax?",
+      "relevant_year": 2024,
+      "relevant_section_hint": "Note — Restructuring and Other Costs"
+    },
+    {
+      "id": "Q09",
+      "question": "How does The Hartford describe its cybersecurity 'defense-in-depth' program?",
+      "relevant_year": 2026,
+      "relevant_section_hint": "Item 1C Cybersecurity"
+    },
+    {
+      "id": "Q10",
+      "question": "Did the auditor conclude that internal control over financial reporting was effective as of December 31, 2024?",
+      "relevant_year": 2025,
+      "relevant_section_hint": "Item 9A Controls and Procedures"
+    }
+  ]
+}

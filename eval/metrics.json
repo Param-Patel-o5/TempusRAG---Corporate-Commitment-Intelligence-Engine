@@ -1,0 +1,766 @@
+{
+  "generated_at": "2026-09-10T17:28:35Z",
+  "llm_calls": false,
+  "summary": {
+    "passed": 94,
+    "total": 94,
+    "failed": 0
+  },
+  "quality_read": "**Schemas, RRF, section boost, lost-in-middle, and scorer math are solid** \u2014 they match the locked contracts and are safe to cite as no-LLM correctness.\n\n**Chunker is mixed.** Mean chunk size (412.4 words) sits under the 500-word cap, and IDs/prefixes are consistent. But **43 chunks (2.3%) overflow**, with a max of **3383 words** (long tables/sentences force-appended). That hurts embedding quality and context windows; it is a real defect, not a failed unit test.\n\n**Cached 10-K parse is coarse** (Item-level sections, few true subsections). Fine for indexing, weak for MD&A-only promise targeting until HTML heading parse improves.\n\nHyDE/follow-up heuristics are rule-based only; they are not a substitute for LLM eval.",
+  "models": {
+    "schemas": [
+      "Promise",
+      "DeliveryEvidence",
+      "CompanyCredibilityReport",
+      "Chunk"
+    ]
+  },
+  "retriever": {
+    "rrf_k": 60,
+    "rrf_order": [
+      "A",
+      "C",
+      "B",
+      "D"
+    ],
+    "lost_in_middle": [
+      "A",
+      "C",
+      "D",
+      "E",
+      "B"
+    ],
+    "bm25_sample_tokens": [
+      "we",
+      "are",
+      "investing",
+      "in",
+      "digital",
+      "transformation"
+    ]
+  },
+  "scorer": {
+    "confidence_with_metric_deadline": 1.0,
+    "confidence_vague": 0.2,
+    "fixture_overall_score": 85.0,
+    "fixture_red_flags_abandoned_case": [
+      "Majority of promises abandoned",
+      "Domain Claims has low credibility (avg score: 10.0)",
+      "Overall credibility is low"
+    ],
+    "fixture_report_overall": 85.0
+  },
+  "filings": {
+    "cached_filings": 15,
+    "tickers": [
+      "AAPL",
+      "HIG",
+      "NVDA"
+    ],
+    "total_chunks": 1902,
+    "per_filing": [
+      {
+        "file": "AAPL_2021.txt",
+        "ticker": "AAPL",
+        "year": 2021,
+        "bytes": 224311,
+        "chars": 218597,
+        "section_count": 26,
+        "nonempty_subsections": 26,
+        "empty_subsections": 0,
+        "chunk_count": 95,
+        "word_count_mean": 380.2,
+        "word_count_max": 757,
+        "unique_chunk_ids": true,
+        "chunks_over_soft_cap": 2
+      },
+      {
+        "file": "AAPL_2022.txt",
+        "ticker": "AAPL",
+        "year": 2022,
+        "bytes": 216668,
+        "chars": 211000,
+        "section_count": 26,
+        "nonempty_subsections": 26,
+        "empty_subsections": 0,
+        "chunk_count": 92,
+        "word_count_mean": 376.0,
+        "word_count_max": 757,
+        "unique_chunk_ids": true,
+        "chunks_over_soft_cap": 2
+      },
+      {
+        "file": "AAPL_2023.txt",
+        "ticker": "AAPL",
+        "year": 2023,
+        "bytes": 201027,
+        "chars": 195554,
+        "section_count": 27,
+        "nonempty_subsections": 27,
+        "empty_subsections": 0,
+        "chunk_count": 87,
+        "word_count_mean": 368.9,
+        "word_count_max": 757,
+        "unique_chunk_ids": true,
+        "chunks_over_soft_cap": 1
+      },
+      {
+        "file": "AAPL_2024.txt",
+        "ticker": "AAPL",
+        "year": 2024,
+        "bytes": 204783,
+        "chars": 199326,
+        "section_count": 27,
+        "nonempty_subsections": 27,
+        "empty_subsections": 0,
+        "chunk_count": 85,
+        "word_count_mean": 381.2,
+        "word_count_max": 731,
+        "unique_chunk_ids": true,
+        "chunks_over_soft_cap": 2
+      },
+      {
+        "file": "AAPL_2025.txt",
+        "ticker": "AAPL",
+        "year": 2025,
+        "bytes": 207438,
+        "chars": 201784,
+        "section_count": 27,
+        "nonempty_subsections": 27,
+        "empty_subsections": 0,
+        "chunk_count": 87,
+        "word_count_mean": 377.4,
+        "word_count_max": 731,
+        "unique_chunk_ids": true,
+        "chunks_over_soft_cap": 1
+      },
+      {
+        "file": "HIG_2022.txt",
+        "ticker": "HIG",
+        "year": 2022,
+        "bytes": 446664,
+        "chars": 427878,
+        "section_count": 18,
+        "nonempty_subsections": 18,
+        "empty_subsections": 0,
+        "chunk_count": 173,
+        "word_count_mean": 435.4,
+        "word_count_max": 1074,
+        "unique_chunk_ids": true,
+        "chunks_over_soft_cap": 2
+      },
+      {
+        "file": "HIG_2023.txt",
+        "ticker": "HIG",
+        "year": 2023,
+        "bytes": 430128,
+        "chars": 411603,
+        "section_count": 17,
+        "nonempty_subsections": 17,
+        "empty_subsections": 0,
+        "chunk_count": 165,
+        "word_count_mean": 438.8,
+        "word_count_max": 1070,
+        "unique_chunk_ids": true,
+        "chunks_over_soft_cap": 2
+      },
+      {
+        "file": "HIG_2024.txt",
+        "ticker": "HIG",
+        "year": 2024,
+        "bytes": 431751,
+        "chars": 412792,
+        "section_count": 19,
+        "nonempty_subsections": 19,
+        "empty_subsections": 0,
+        "chunk_count": 172,
+        "word_count_mean": 425.5,
+        "word_count_max": 1072,
+        "unique_chunk_ids": true,
+        "chunks_over_soft_cap": 4
+      },
+      {
+        "file": "HIG_2025.txt",
+        "ticker": "HIG",
+        "year": 2025,
+        "bytes": 408622,
+        "chars": 389842,
+        "section_count": 19,
+        "nonempty_subsections": 19,
+        "empty_subsections": 0,
+        "chunk_count": 159,
+        "word_count_mean": 431.7,
+        "word_count_max": 1046,
+        "unique_chunk_ids": true,
+        "chunks_over_soft_cap": 5
+      },
+      {
+        "file": "HIG_2026.txt",
+        "ticker": "HIG",
+        "year": 2026,
+        "bytes": 404951,
+        "chars": 386737,
+        "section_count": 21,
+        "nonempty_subsections": 21,
+        "empty_subsections": 0,
+        "chunk_count": 143,
+        "word_count_mean": 473.9,
+        "word_count_max": 3383,
+        "unique_chunk_ids": true,
+        "chunks_over_soft_cap": 7
+      },
+      {
+        "file": "NVDA_2022.txt",
+        "ticker": "NVDA",
+        "year": 2022,
+        "bytes": 307643,
+        "chars": 301557,
+        "section_count": 26,
+        "nonempty_subsections": 26,
+        "empty_subsections": 0,
+        "chunk_count": 123,
+        "word_count_mean": 411.2,
+        "word_count_max": 1608,
+        "unique_chunk_ids": true,
+        "chunks_over_soft_cap": 3
+      },
+      {
+        "file": "NVDA_2023.txt",
+        "ticker": "NVDA",
+        "year": 2023,
+        "bytes": 320763,
+        "chars": 314168,
+        "section_count": 26,
+        "nonempty_subsections": 26,
+        "empty_subsections": 0,
+        "chunk_count": 126,
+        "word_count_mean": 415.8,
+        "word_count_max": 1591,
+        "unique_chunk_ids": true,
+        "chunks_over_soft_cap": 3
+      },
+      {
+        "file": "NVDA_2024.txt",
+        "ticker": "NVDA",
+        "year": 2024,
+        "bytes": 336133,
+        "chars": 329966,
+        "section_count": 24,
+        "nonempty_subsections": 24,
+        "empty_subsections": 0,
+        "chunk_count": 129,
+        "word_count_mean": 425.9,
+        "word_count_max": 1599,
+        "unique_chunk_ids": true,
+        "chunks_over_soft_cap": 3
+      },
+      {
+        "file": "NVDA_2025.txt",
+        "ticker": "NVDA",
+        "year": 2025,
+        "bytes": 349723,
+        "chars": 343301,
+        "section_count": 27,
+        "nonempty_subsections": 27,
+        "empty_subsections": 0,
+        "chunk_count": 134,
+        "word_count_mean": 423.4,
+        "word_count_max": 1552,
+        "unique_chunk_ids": true,
+        "chunks_over_soft_cap": 3
+      },
+      {
+        "file": "NVDA_2026.txt",
+        "ticker": "NVDA",
+        "year": 2026,
+        "bytes": 341411,
+        "chars": 335228,
+        "section_count": 27,
+        "nonempty_subsections": 27,
+        "empty_subsections": 0,
+        "chunk_count": 132,
+        "word_count_mean": 420.2,
+        "word_count_max": 1467,
+        "unique_chunk_ids": true,
+        "chunks_over_soft_cap": 3
+      }
+    ],
+    "chunk_max_tokens_config": 500,
+    "chunks_over_soft_cap_total": 43,
+    "overflow_rate": 0.0226,
+    "max_chunk_words": 3383,
+    "mean_chunk_words": 412.4
+  },
+  "checks": [
+    {
+      "name": "promise_roundtrip",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "invalid_domain_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "confidence_bounds",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "all_five_domains_construct",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "all_four_statuses_construct",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "delivery_score_upper_bound",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "overall_score_upper_bound",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "delivery_score_zero_allowed",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "rrf_order",
+      "pass": true,
+      "detail": "got ['A', 'C', 'B', 'D']"
+    },
+    {
+      "name": "section_boost_mda_gt_risk",
+      "pass": true,
+      "detail": "A=1.200 B=0.800"
+    },
+    {
+      "name": "lost_in_middle",
+      "pass": true,
+      "detail": "got ['A', 'C', 'D', 'E', 'B']"
+    },
+    {
+      "name": "bm25_tokenize",
+      "pass": true,
+      "detail": "['we', 'are', 'investing', 'in', 'digital', 'transformation']"
+    },
+    {
+      "name": "bm25_tokenize_empty",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "bm25_tokenize_lower",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "rrf_empty",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "rrf_dense_only_keeps_order",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "lost_in_middle_empty",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "lost_in_middle_one",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "lost_in_middle_two",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "lost_in_middle_three",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "section_boost_outlook_gt_mda",
+      "pass": true,
+      "detail": "F=1.300 A=1.200"
+    },
+    {
+      "name": "confidence_metric_is_1",
+      "pass": true,
+      "detail": "1.0"
+    },
+    {
+      "name": "confidence_vague_is_0_2",
+      "pass": true,
+      "detail": "0.2"
+    },
+    {
+      "name": "recency_current",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "recency_floor",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "overall_unweighted_tie_year",
+      "pass": true,
+      "detail": "85.0"
+    },
+    {
+      "name": "red_flag_majority_abandoned",
+      "pass": true,
+      "detail": "['Majority of promises abandoned', 'Domain Claims has low credibility (avg score: 10.0)', 'Overall credibility is low']"
+    },
+    {
+      "name": "report_delivered_2",
+      "pass": true,
+      "detail": "2"
+    },
+    {
+      "name": "recency_minus_1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "recency_minus_2",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "recency_minus_3",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "domain_claims_is_80",
+      "pass": true,
+      "detail": "{'Claims': 80.0, 'Technology': 90.0}"
+    },
+    {
+      "name": "empty_evidence_overall_zero",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "red_flag_all_pending",
+      "pass": true,
+      "detail": "['No promises have reached evaluation point yet']"
+    },
+    {
+      "name": "status_count_delivered",
+      "pass": true,
+      "detail": "{'Delivered': 2, 'Partial': 0, 'Silently Abandoned': 0, 'Pending': 0}"
+    },
+    {
+      "name": "add_confidence_writes_field",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "recency_weighted_not_simple_mean",
+      "pass": true,
+      "detail": "62.5"
+    },
+    {
+      "name": "sentence_split_keeps_abbrev",
+      "pass": true,
+      "detail": "['The U.S. market is strong', 'Inc. profits are up', 'What will happen next?']"
+    },
+    {
+      "name": "AAPL_2021.txt_has_sections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "AAPL_2021.txt_unique_ids",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "AAPL_2021.txt_prefixed_chunks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "AAPL_2022.txt_has_sections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "AAPL_2022.txt_unique_ids",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "AAPL_2022.txt_prefixed_chunks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "AAPL_2023.txt_has_sections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "AAPL_2023.txt_unique_ids",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "AAPL_2023.txt_prefixed_chunks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "AAPL_2024.txt_has_sections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "AAPL_2024.txt_unique_ids",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "AAPL_2024.txt_prefixed_chunks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "AAPL_2025.txt_has_sections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "AAPL_2025.txt_unique_ids",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "AAPL_2025.txt_prefixed_chunks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "HIG_2022.txt_has_sections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "HIG_2022.txt_unique_ids",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "HIG_2022.txt_prefixed_chunks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "HIG_2023.txt_has_sections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "HIG_2023.txt_unique_ids",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "HIG_2023.txt_prefixed_chunks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "HIG_2024.txt_has_sections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "HIG_2024.txt_unique_ids",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "HIG_2024.txt_prefixed_chunks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "HIG_2025.txt_has_sections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "HIG_2025.txt_unique_ids",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "HIG_2025.txt_prefixed_chunks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "HIG_2026.txt_has_sections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "HIG_2026.txt_unique_ids",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "HIG_2026.txt_prefixed_chunks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NVDA_2022.txt_has_sections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NVDA_2022.txt_unique_ids",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NVDA_2022.txt_prefixed_chunks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NVDA_2023.txt_has_sections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NVDA_2023.txt_unique_ids",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NVDA_2023.txt_prefixed_chunks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NVDA_2024.txt_has_sections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NVDA_2024.txt_unique_ids",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NVDA_2024.txt_prefixed_chunks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NVDA_2025.txt_has_sections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NVDA_2025.txt_unique_ids",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NVDA_2025.txt_prefixed_chunks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NVDA_2026.txt_has_sections",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NVDA_2026.txt_unique_ids",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NVDA_2026.txt_prefixed_chunks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "chunk_id_contains_ticker_year",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "chunk_id_differs_by_year",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "paragraph_split_two",
+      "pass": true,
+      "detail": "['First paragraph here.', 'Second paragraph here.']"
+    },
+    {
+      "name": "chunk_empty_text",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "prefix_with_subsection",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "prefix_full_text",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "promise_section_filter_keeps_mda",
+      "pass": true,
+      "detail": "['MD&A']"
+    },
+    {
+      "name": "followup_detects_pronoun",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "hyde_skips_specific",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "hyde_on_vague",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "mean_chunk_words_under_cap",
+      "pass": true,
+      "detail": "412.3666666666667"
+    }
+  ]
+}

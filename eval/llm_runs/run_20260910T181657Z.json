@@ -1,0 +1,357 @@
+{
+  "created_at": "20260910T181657Z",
+  "mode": "live",
+  "extract": {
+    "E01": {
+      "json_parse_ok": true,
+      "error": null,
+      "promises": [
+        {
+          "promise_text": "The Hartford seeks to be an insurance industry leader in ensuring a diverse workforce and creating an equitable and inclusive workplace, enabling us to attract and leverage top talent to meet our business goals.",
+          "domain": "Operations",
+          "deadline_mentioned": null,
+          "year_made": 2023,
+          "page_number": 0,
+          "confidence_score": null
+        },
+        {
+          "promise_text": "We are committed to ethical conduct and a bias-free workplace for all employees as we continue building, enhancing and sustaining an inclusive supportive culture that reflects the diversity of our customer base.",
+          "domain": "Operations",
+          "deadline_mentioned": null,
+          "year_made": 2023,
+          "page_number": 0,
+          "confidence_score": null
+        },
+        {
+          "promise_text": "We continue to invest in and accelerate a wide range of strategies to improve representation of talent that’s demographically underrepresented in the insurance industry, including targeted initiatives to improve the representation of women and people of color.",
+          "domain": "Operations",
+          "deadline_mentioned": null,
+          "year_made": 2023,
+          "page_number": 0,
+          "confidence_score": null
+        }
+      ]
+    },
+    "E02": {
+      "json_parse_ok": true,
+      "error": null,
+      "promises": [
+        {
+          "promise_text": "We currently expect that the 2024 and 2027 performance share awards will include a similar modifier to encourage continued progress toward the Company's 2030 representation goals.",
+          "domain": "Operations",
+          "deadline_mentioned": "2030",
+          "year_made": 2023,
+          "page_number": 0,
+          "confidence_score": null
+        },
+        {
+          "promise_text": "The Hartford’s 2022 Sustainability Report is expected to be published following the Company’s annual meeting in May 2023.",
+          "domain": "Operations",
+          "deadline_mentioned": "May 2023",
+          "year_made": 2023,
+          "page_number": 0,
+          "confidence_score": null
+        }
+      ]
+    },
+    "E03": {
+      "json_parse_ok": true,
+      "error": null,
+      "promises": [
+        {
+          "promise_text": "The Board of Directors increased this authorization by $ 1 billion in April, 2021 and by $ 500 in October, 2021, bringing the aggregate repurchase authorization to $ 3.0 billion through December 31, 2022.",
+          "domain": "Finance",
+          "deadline_mentioned": "December 31, 2022",
+          "year_made": 2022,
+          "page_number": 0,
+          "confidence_score": null
+        }
+      ]
+    },
+    "E04": {
+      "json_parse_ok": true,
+      "error": null,
+      "promises": [
+        {
+          "promise_text": "In July, 2022, the Board of Directors approved a share repurchase authorization for up to $ 3.0 billion effective from August 1, 2022 to December 31, 2024.",
+          "domain": "Finance",
+          "deadline_mentioned": "December 31, 2024",
+          "year_made": 2023,
+          "page_number": 0,
+          "confidence_score": null
+        }
+      ]
+    },
+    "E05": {
+      "json_parse_ok": true,
+      "error": null,
+      "promises": [
+        {
+          "promise_text": "In July, 2022, the Board of Directors approved a share repurchase authorization for up to $ 3.0 billion effective from August 1, 2022 to December 31, 2024.",
+          "domain": "Finance",
+          "deadline_mentioned": "December 31, 2024",
+          "year_made": 2024,
+          "page_number": 0,
+          "confidence_score": null
+        }
+      ]
+    },
+    "E06": {
+      "json_parse_ok": true,
+      "error": null,
+      "promises": [
+        {
+          "promise_text": "In July, 2024, the Board of Directors approved a share repurchase authorization for up to $ 3.3 billion effective from August 1, 2024 to December 31, 2026.",
+          "domain": "Finance",
+          "deadline_mentioned": "December 31, 2026",
+          "year_made": 2025,
+          "page_number": 0,
+          "confidence_score": null
+        }
+      ]
+    },
+    "E07": {
+      "json_parse_ok": true,
+      "error": null,
+      "promises": [
+        {
+          "promise_text": "In July, 2024, the Board of Directors approved a share repurchase authorization for up to $ 3.3 billion effective from August 1, 2024 to December 31, 2026.",
+          "domain": "Finance",
+          "deadline_mentioned": "December 31, 2026",
+          "year_made": 2026,
+          "page_number": 0,
+          "confidence_score": null
+        }
+      ]
+    },
+    "E08": {
+      "json_parse_ok": true,
+      "error": null,
+      "promises": [
+        {
+          "promise_text": "The Company expects the adoption of the new guidance to result in an increase of approximately $ 85 to the reserve for future policy benefits and a decrease of approximately $ 65 after tax to accumulated other comprehensive income (\"AOCI\") as of the transition date because market upper-medium grade (low-credit-risk) fixed-income investment yields were lower as of the transition date than the locked in rates that were previously used to discount the reserves.",
+          "domain": "Finance",
+          "deadline_mentioned": "as of the transition date",
+          "year_made": 2023,
+          "page_number": 0,
+          "confidence_score": null
+        }
+      ]
+    },
+    "E09": {
+      "json_parse_ok": true,
+      "error": null,
+      "promises": [
+        {
+          "promise_text": "The Company expects the adoption of the new guidance to result in an increase to the reserve for future policy benefits and a corresponding decrease to accumulated other comprehensive income (\"AOCI\") as of the transition date because market upper-medium grade (low-credit-risk) fixed-income investment yields were lower as of the transition date than the locked in rates that were previously used to discount the reserves.",
+          "domain": "Finance",
+          "deadline_mentioned": null,
+          "year_made": 2022,
+          "page_number": 0,
+          "confidence_score": null
+        },
+        {
+          "promise_text": "The adoption is not expected to have a material effect on the Company’s total liabilities, stockholders’ equity or results of operations.",
+          "domain": "Finance",
+          "deadline_mentioned": null,
+          "year_made": 2022,
+          "page_number": 0,
+          "confidence_score": null
+        }
+      ]
+    },
+    "E10": {
+      "json_parse_ok": true,
+      "error": null,
+      "promises": [
+        {
+          "promise_text": "Total restructuring and other costs are expected to be approximately $ 126 , before tax, and will be recognized in Corporate for segment reporting.",
+          "domain": "Finance",
+          "deadline_mentioned": null,
+          "year_made": 2024,
+          "page_number": 0,
+          "confidence_score": null
+        }
+      ]
+    },
+    "E11": {
+      "json_parse_ok": true,
+      "error": null,
+      "promises": [
+        {
+          "promise_text": "committed to fund limited partnerships and other alternative investments, which may be called by the partnership during the commitment period to fund the purchase of new investments and partnership expenses",
+          "domain": "Finance",
+          "deadline_mentioned": null,
+          "year_made": 2022,
+          "page_number": 0,
+          "confidence_score": null
+        }
+      ]
+    },
+    "E12": {
+      "json_parse_ok": true,
+      "error": null,
+      "promises": [
+        {
+          "promise_text": "The Hartford continues to monitor and enhance its framework to respond to evolving cyber threats and regulations for data privacy, including the European Union General Data Protection Regulation, the California Consumer Privacy Act and the New York Department of Financial Services Cybersecurity Regulation.",
+          "domain": "Technology",
+          "deadline_mentioned": null,
+          "year_made": 2026,
+          "page_number": 0,
+          "confidence_score": null
+        }
+      ]
+    },
+    "E13": {
+      "json_parse_ok": true,
+      "error": null,
+      "promises": []
+    },
+    "E14": {
+      "json_parse_ok": true,
+      "error": null,
+      "promises": []
+    },
+    "E15": {
+      "json_parse_ok": true,
+      "error": null,
+      "promises": []
+    },
+    "E16": {
+      "json_parse_ok": false,
+      "error": "429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\nPlease retry in 20.903438336s. [links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerDayPerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-3.6-flash\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n  quota_value: 20\n}\n, retry_delay {\n  seconds: 20\n}\n]",
+      "promises": []
+    },
+    "E17": {
+      "json_parse_ok": false,
+      "error": "429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\nPlease retry in 3.993262233s. [links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerDayPerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-3.6-flash\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n  quota_value: 20\n}\n, retry_delay {\n  seconds: 3\n}\n]",
+      "promises": []
+    },
+    "E18": {
+      "json_parse_ok": false,
+      "error": "429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\nPlease retry in 46.513370659s. [links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerDayPerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-3.6-flash\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n  quota_value: 20\n}\n, retry_delay {\n  seconds: 46\n}\n]",
+      "promises": []
+    },
+    "E19": {
+      "json_parse_ok": false,
+      "error": "429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\nPlease retry in 29.600228393s. [links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerDayPerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-3.6-flash\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n  quota_value: 20\n}\n, retry_delay {\n  seconds: 29\n}\n]",
+      "promises": []
+    },
+    "E20": {
+      "json_parse_ok": false,
+      "error": "429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\nPlease retry in 12.819192467s. [links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerDayPerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-3.6-flash\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n  quota_value: 20\n}\n, retry_delay {\n  seconds: 12\n}\n]",
+      "promises": []
+    }
+  },
+  "judge": {
+    "J01": {
+      "json_parse_ok": true,
+      "error": null,
+      "status": "Delivered",
+      "delivery_score": 80,
+      "judge_reasoning": "The promise was a $3.0 billion share repurchase authorized from August 1 2022 through December 31 2024. The 2024 filing confirms that as of December 31 2023 the company had repurchased $1.4 billion and still had $1.35 billion remaining under the program. It also reports an additional $200 million repurchased between January 1 2024 and February 22 2024. This shows clear, documented progress toward the $3.0 billion target, with roughly $1.6 billion already repurchased and the program still active until the deadline. Because the deadline has not yet passed, the full metric cannot be confirmed, but the evidence meets the 70‑89 anchor for confirmed progress with incomplete metrics, yielding a score of 80 and a Delivered status."
+    },
+    "J02": {
+      "json_parse_ok": true,
+      "error": null,
+      "status": "Delivered",
+      "delivery_score": 90,
+      "judge_reasoning": "The promise made was a $3.0 billion share repurchase authorization effective from August 1, 2022, through December 31, 2024. The evidence provided shows that during the year ended December 31, 2024, the Company repurchased $1.5 billion of common stock under this program. Additionally, it is stated that the Hartford's $3.0 billion equity repurchase program authorized by its Board of Directors in August 2022 expired on December 31, 2024. This indicates that the program was completed as planned and the full amount was not repurchased but a significant portion was, confirming delivery."
+    },
+    "J03": {
+      "json_parse_ok": true,
+      "error": null,
+      "status": "Pending",
+      "delivery_score": 80,
+      "judge_reasoning": "The SEC filing confirms that the $3.3 billion share repurchase program was authorized and that the company has been actively repurchasing shares. As of December 31 2025, $1.55 billion remained available, and an additional $247 million was repurchased between January 1 2026 and February 19 2026, indicating substantial progress toward the $3.3 billion target. However, the filing does not show that the full $3.3 billion was repurchased, and the deadline of December 31 2026 has not yet passed. Therefore the promise is still in progress, meeting the \"confirmed progress, metrics incomplete\" anchor (70‑89) but cannot be judged as fully delivered or abandoned at this time."
+    },
+    "J04": {
+      "json_parse_ok": true,
+      "error": null,
+      "status": "Delivered",
+      "delivery_score": 90,
+      "judge_reasoning": "The promise was to have a $3.0 billion aggregate equity repurchase authorization in place through December 31, 2022. The 2023 filing confirms that in July 2022 the Board approved a $3.0 billion share repurchase program effective August 1, 2022 to December 31, 2024. As of the deadline (December 31, 2022) the company had $2.75 billion remaining under this program and had already repurchased $1.6 billion (22.3 million shares) during 2022. This demonstrates that the $3.0 billion authorization was indeed established and largely unspent by the deadline, satisfying the promise. The evidence explicitly matches the promised metric, warranting a high score in the 90‑100 range and a Delivered status."
+    },
+    "J05": {
+      "json_parse_ok": true,
+      "error": null,
+      "status": "Silently Abandoned",
+      "delivery_score": 0,
+      "judge_reasoning": "The promise was to publish the 2022 Sustainability Report after the May 2023 annual meeting. The only evidence supplied is a table of insurance financial metrics from the 2024 SEC filing (covering years 2021-2023). This document contains no reference to a sustainability report, its publication, or any related ESG disclosure. Because the deadline has passed and there is no explicit or implicit confirmation of the report’s release, the evidence suggests the promise was not fulfilled and was effectively abandoned without public acknowledgment."
+    },
+    "J06": {
+      "json_parse_ok": true,
+      "error": null,
+      "status": "Delivered",
+      "delivery_score": 90,
+      "judge_reasoning": "The SEC filing explicitly states that total restructuring and other costs are expected to be approximately $126 before tax, matching the management promise. The detailed breakdown shows incurred amounts for 2021-2023 and a cumulative total of $126, confirming the expected cost target was met. The accrued liability was fully settled by year‑end, indicating the restructuring plan was completed as promised. This satisfies the 'Explicit delivery with matching metrics' anchor (90‑100)."
+    },
+    "J07": {
+      "json_parse_ok": true,
+      "error": null,
+      "status": "Silently Abandoned",
+      "delivery_score": 0,
+      "judge_reasoning": "The SEC filing excerpt provided for 2021‑2023 contains only premium, loss, expense, and other operating data. It does not discuss the impact of LDTI adoption on the reserve for future policy benefits or on accumulated other comprehensive income (AOCI). There is no mention of an $85 million increase in reserves or a $65 million after‑tax decrease in AOCI at the transition date. Because the promised quantitative effects are absent and no related metrics are reported, the evidence does not confirm any delivery of the promise. According to the scoring rubric, this falls in the 0‑29 range, indicating no evidence of fulfillment."
+    },
+    "J08": {
+      "json_parse_ok": true,
+      "error": null,
+      "status": "Silently Abandoned",
+      "delivery_score": 0,
+      "judge_reasoning": "The 2025 SEC filing provided focuses exclusively on the company's internal control over financial reporting and the auditor's opinion on the 2024 financial statements. It contains no reference to the workforce representation goals for women and people of color in executive roles that were tied to the 2021 performance share awards, nor does it provide any metrics or discussion of progress toward those goals. The deadline for those goals was year‑end 2023, and the filing does not indicate that the goals were met, partially met, or even addressed. Because there is no evidence confirming delivery and no mention of the promise after the deadline, the promise appears to have been silently abandoned."
+    },
+    "J09": {
+      "json_parse_ok": true,
+      "error": null,
+      "status": "Partial",
+      "delivery_score": 50,
+      "judge_reasoning": "The 2026 SEC filing provides detailed data on treasury stock, share issuances, dividends, and equity balances, but it does not contain any explicit reference to the company's 2030 representation goals or to performance‑share modifiers tied to the 2024 and 2027 awards. The promise made in 2023 was to continue progress toward those representation goals, yet the evidence shows only generic compensation‑plan activity without linking it to diversity or representation metrics. Because the topic (share‑based compensation) is mentioned but there is no clear confirmation that the specific representation‑goal‑related modifiers are being applied, the assessment falls into the 50‑69 bracket, indicating the topic is mentioned but lacking clear confirmation. Hence a score of 50 and a status of Partial."
+    },
+    "J10": {
+      "json_parse_ok": true,
+      "error": null,
+      "status": "Silently Abandoned",
+      "delivery_score": 0,
+      "judge_reasoning": "The 2025 filing only discusses internal control over financial reporting and provides an audit opinion; it contains no mention of any modernization of the claims platform or any reduction in claims cycle time. The promise’s deadline (2024) has passed, and there is no evidence of progress or achievement, indicating the promise was not delivered and appears to have been silently abandoned."
+    },
+    "J11": {
+      "json_parse_ok": true,
+      "error": null,
+      "status": "Delivered",
+      "delivery_score": 90,
+      "judge_reasoning": "The 2026 SEC filing explicitly states that The Hartford employs a ‘defense-in-depth’ strategy that aligns to the NIST Cybersecurity Framework. It details implementation of controls across the six NIST categories (governance, identification, protection, detection, response, recovery) and lists specific security measures (reputational filtering, anti-virus, intrusion prevention, MFA, account isolation, dark web monitoring, email sandboxing, endpoint detection, intrusion detection). The filing also notes ongoing monitoring, enhancements, external testing, and collaboration with industry and regulators, demonstrating continuous adherence to the promised program. This matches the promise of maintaining a defense‑in‑depth program aligned to NIST, providing explicit evidence of delivery, thus scoring in the 90‑100 range."
+    },
+    "J12": {
+      "json_parse_ok": true,
+      "error": null,
+      "status": "Pending",
+      "delivery_score": 0,
+      "judge_reasoning": "The only evidence provided is from 2022, which predates the management promise made in 2025. It discusses internal control over financial reporting and contains no reference to the $3.3 billion share repurchase program, its authorization, or any related activity. Because there is no post‑2025 evidence and the deadline of December 31 2026 has not yet passed, we cannot assess whether the promise was fulfilled, partially fulfilled, or abandoned. Consequently, the appropriate status is Pending, with a delivery score of 0 due to the absence of any relevant evidence."
+    },
+    "J13": {
+      "json_parse_ok": true,
+      "error": null,
+      "status": "Delivered",
+      "delivery_score": 75,
+      "judge_reasoning": "The 2022 SEC filing restates the company's commitment to fund limited partnerships and other alternative investments when called during the commitment period. It lists $185 million of outstanding commitments related to private debt and equity securities and $679 million related to mortgage loans, showing that the company has active funding obligations that can be called. This confirms that the promise is being honored in principle and that funding mechanisms are in place. However, the filing does not provide concrete figures on how much has actually been funded versus the total commitment, so the evidence confirms progress but lacks complete metrics. Therefore the promise is considered delivered with confirmed progress, placing the score in the 70‑89 range."
+    },
+    "J14": {
+      "json_parse_ok": true,
+      "error": null,
+      "status": "Delivered",
+      "delivery_score": 85,
+      "judge_reasoning": "The 2024 promise stated that the company may repurchase remaining authorized shares, with the decision contingent on market price, capital position, credit ratings, and blackout periods. The 2026 SEC filing confirms that a $3.3 billion share repurchase program was approved in July 2024 and was active through December 31 2026. The filing details actual repurchases: $1.5 billion in 2024, $1.6 billion in 2025, and $247 million (1.8 million shares) from Jan 1 2026 to Feb 19 2026. It explicitly notes that the timing of repurchases depends on the same factors cited in the promise—market price, capital position, impact on financial strength or credit ratings, and blackout periods. This demonstrates that the company acted in line with the promised conditions and made substantial repurchases, though the filing does not provide a final tally of all authorized shares repurchased by the program end. Because progress is clearly documented and aligns with the stated criteria, the promise is considered delivered, earning a score in the 70‑89 range. The chosen score of 85 reflects confirmed progress with incomplete final metrics."
+    },
+    "J15": {
+      "json_parse_ok": true,
+      "error": null,
+      "status": "Partial",
+      "delivery_score": 50,
+      "judge_reasoning": "The 2025 filing excerpt discusses the auditor’s opinion on internal control over financial reporting and the audit of the consolidated financial statements. While it references the company’s management responsibility for reporting and internal controls, it does not specifically confirm that the 10‑K, 10‑Q, and 8‑K reports were posted on the investor‑relations website promptly after SEC filing. The promise’s topic (publishing filings) is mentioned indirectly in the context of reporting, but there is no explicit evidence of compliance, placing the assessment in the 50‑69 range (topic mentioned, no clear confirmation)."
+    }
+  },
+  "qa": {
+    "skipped": true,
+    "reason": "Hit@5 needs a Chroma index; not run in this harness"
+  }
+}

@@ -1,0 +1,340 @@
+{
+  "generated_at": "2026-09-10T18:25:52Z",
+  "gold_meta": {
+    "issuer": "HIG",
+    "issuer_name": "The Hartford",
+    "created_at": "2026-09-10T18:07:07Z",
+    "source": "Cached SEC 10-K plaintext in data/filings/HIG_YYYY.txt (EDGAR HTML parse, whitespace-normalized).",
+    "n_extract": 20,
+    "n_judge": 15,
+    "n_qa": 10,
+    "n_extract_none": 7,
+    "n_extract_with_deadline": 8,
+    "caveat": "Hand-labeled from excerpts; HIG only; not a statistically powered eval."
+  },
+  "extract": {
+    "n": 20,
+    "n_scored": 15,
+    "skipped_quota": 5,
+    "json_parse_success_rate": 1.0,
+    "promise_precision": 1.0,
+    "promise_recall": 1.0,
+    "tp": 12,
+    "fp": 0,
+    "fn": 0,
+    "tn": 3,
+    "domain_accuracy": 0.9167,
+    "deadline_accuracy": 0.8333,
+    "rows": [
+      {
+        "id": "E01",
+        "gold_has_promise": true,
+        "pred_has_promise": true,
+        "json_parse_ok": true,
+        "n_pred": 3
+      },
+      {
+        "id": "E02",
+        "gold_has_promise": true,
+        "pred_has_promise": true,
+        "json_parse_ok": true,
+        "n_pred": 2
+      },
+      {
+        "id": "E03",
+        "gold_has_promise": true,
+        "pred_has_promise": true,
+        "json_parse_ok": true,
+        "n_pred": 1
+      },
+      {
+        "id": "E04",
+        "gold_has_promise": true,
+        "pred_has_promise": true,
+        "json_parse_ok": true,
+        "n_pred": 1
+      },
+      {
+        "id": "E05",
+        "gold_has_promise": true,
+        "pred_has_promise": true,
+        "json_parse_ok": true,
+        "n_pred": 1
+      },
+      {
+        "id": "E06",
+        "gold_has_promise": true,
+        "pred_has_promise": true,
+        "json_parse_ok": true,
+        "n_pred": 1
+      },
+      {
+        "id": "E07",
+        "gold_has_promise": true,
+        "pred_has_promise": true,
+        "json_parse_ok": true,
+        "n_pred": 1
+      },
+      {
+        "id": "E08",
+        "gold_has_promise": true,
+        "pred_has_promise": true,
+        "json_parse_ok": true,
+        "n_pred": 1
+      },
+      {
+        "id": "E09",
+        "gold_has_promise": true,
+        "pred_has_promise": true,
+        "json_parse_ok": true,
+        "n_pred": 2
+      },
+      {
+        "id": "E10",
+        "gold_has_promise": true,
+        "pred_has_promise": true,
+        "json_parse_ok": true,
+        "n_pred": 1
+      },
+      {
+        "id": "E11",
+        "gold_has_promise": true,
+        "pred_has_promise": true,
+        "json_parse_ok": true,
+        "n_pred": 1
+      },
+      {
+        "id": "E12",
+        "gold_has_promise": true,
+        "pred_has_promise": true,
+        "json_parse_ok": true,
+        "n_pred": 1
+      },
+      {
+        "id": "E13",
+        "gold_has_promise": false,
+        "pred_has_promise": false,
+        "json_parse_ok": true,
+        "n_pred": 0
+      },
+      {
+        "id": "E14",
+        "gold_has_promise": false,
+        "pred_has_promise": false,
+        "json_parse_ok": true,
+        "n_pred": 0
+      },
+      {
+        "id": "E15",
+        "gold_has_promise": false,
+        "pred_has_promise": false,
+        "json_parse_ok": true,
+        "n_pred": 0
+      },
+      {
+        "id": "E16",
+        "gold_has_promise": false,
+        "pred_has_promise": null,
+        "json_parse_ok": null,
+        "n_pred": 0,
+        "skipped": "quota"
+      },
+      {
+        "id": "E17",
+        "gold_has_promise": false,
+        "pred_has_promise": null,
+        "json_parse_ok": null,
+        "n_pred": 0,
+        "skipped": "quota"
+      },
+      {
+        "id": "E18",
+        "gold_has_promise": false,
+        "pred_has_promise": null,
+        "json_parse_ok": null,
+        "n_pred": 0,
+        "skipped": "quota"
+      },
+      {
+        "id": "E19",
+        "gold_has_promise": true,
+        "pred_has_promise": null,
+        "json_parse_ok": null,
+        "n_pred": 0,
+        "skipped": "quota"
+      },
+      {
+        "id": "E20",
+        "gold_has_promise": false,
+        "pred_has_promise": null,
+        "json_parse_ok": null,
+        "n_pred": 0,
+        "skipped": "quota"
+      }
+    ]
+  },
+  "judge": {
+    "n": 15,
+    "json_parse_success_rate": 1.0,
+    "exact_status_match_pct": 53.3,
+    "near_agreement_pct": 80.0,
+    "adjacent_errors": 4,
+    "far_errors": 3,
+    "score_band_accuracy": 0.8667,
+    "headline": "Judge status agreement 8/15 (53.3%) on HIG pairs; LLM-as-judge, N=15, HIG only.",
+    "rows": [
+      {
+        "id": "J01",
+        "gold_status": "Pending",
+        "pred_status": "Delivered",
+        "match": "far",
+        "delivery_score": 80,
+        "gold_score_band": "61-85",
+        "band_match": true,
+        "json_parse_ok": true
+      },
+      {
+        "id": "J02",
+        "gold_status": "Delivered",
+        "pred_status": "Delivered",
+        "match": "exact",
+        "delivery_score": 90,
+        "gold_score_band": "86-100",
+        "band_match": true,
+        "json_parse_ok": true
+      },
+      {
+        "id": "J03",
+        "gold_status": "Pending",
+        "pred_status": "Pending",
+        "match": "exact",
+        "delivery_score": 80,
+        "gold_score_band": "61-85",
+        "band_match": true,
+        "json_parse_ok": true
+      },
+      {
+        "id": "J04",
+        "gold_status": "Delivered",
+        "pred_status": "Delivered",
+        "match": "exact",
+        "delivery_score": 90,
+        "gold_score_band": "86-100",
+        "band_match": true,
+        "json_parse_ok": true
+      },
+      {
+        "id": "J05",
+        "gold_status": "Silently Abandoned",
+        "pred_status": "Silently Abandoned",
+        "match": "exact",
+        "delivery_score": 0,
+        "gold_score_band": "0-30",
+        "band_match": true,
+        "json_parse_ok": true
+      },
+      {
+        "id": "J06",
+        "gold_status": "Partial",
+        "pred_status": "Delivered",
+        "match": "adjacent",
+        "delivery_score": 90,
+        "gold_score_band": "61-85",
+        "band_match": false,
+        "json_parse_ok": true
+      },
+      {
+        "id": "J07",
+        "gold_status": "Silently Abandoned",
+        "pred_status": "Silently Abandoned",
+        "match": "exact",
+        "delivery_score": 0,
+        "gold_score_band": "0-30",
+        "band_match": true,
+        "json_parse_ok": true
+      },
+      {
+        "id": "J08",
+        "gold_status": "Silently Abandoned",
+        "pred_status": "Silently Abandoned",
+        "match": "exact",
+        "delivery_score": 0,
+        "gold_score_band": "0-30",
+        "band_match": true,
+        "json_parse_ok": true
+      },
+      {
+        "id": "J09",
+        "gold_status": "Pending",
+        "pred_status": "Partial",
+        "match": "adjacent",
+        "delivery_score": 50,
+        "gold_score_band": "31-60",
+        "band_match": true,
+        "json_parse_ok": true
+      },
+      {
+        "id": "J10",
+        "gold_status": "Silently Abandoned",
+        "pred_status": "Silently Abandoned",
+        "match": "exact",
+        "delivery_score": 0,
+        "gold_score_band": "0-30",
+        "band_match": true,
+        "json_parse_ok": true
+      },
+      {
+        "id": "J11",
+        "gold_status": "Delivered",
+        "pred_status": "Delivered",
+        "match": "exact",
+        "delivery_score": 90,
+        "gold_score_band": "86-100",
+        "band_match": true,
+        "json_parse_ok": true
+      },
+      {
+        "id": "J12",
+        "gold_status": "Silently Abandoned",
+        "pred_status": "Pending",
+        "match": "far",
+        "delivery_score": 0,
+        "gold_score_band": "0-30",
+        "band_match": true,
+        "json_parse_ok": true
+      },
+      {
+        "id": "J13",
+        "gold_status": "Pending",
+        "pred_status": "Delivered",
+        "match": "far",
+        "delivery_score": 75,
+        "gold_score_band": "31-60",
+        "band_match": false,
+        "json_parse_ok": true
+      },
+      {
+        "id": "J14",
+        "gold_status": "Partial",
+        "pred_status": "Delivered",
+        "match": "adjacent",
+        "delivery_score": 85,
+        "gold_score_band": "61-85",
+        "band_match": true,
+        "json_parse_ok": true
+      },
+      {
+        "id": "J15",
+        "gold_status": "Pending",
+        "pred_status": "Partial",
+        "match": "adjacent",
+        "delivery_score": 50,
+        "gold_score_band": "31-60",
+        "band_match": true,
+        "json_parse_ok": true
+      }
+    ]
+  },
+  "headline": "Judge status agreement 8/15 (53.3%) on HIG pairs; LLM-as-judge, N=15, HIG only.",
+  "caveat": "LLM-as-judge, N=15, HIG only. Do not treat overall 0\u2013100 credibility as ground truth."
+}

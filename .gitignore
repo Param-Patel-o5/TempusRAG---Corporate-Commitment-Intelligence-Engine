@@ -1,6 +1,9 @@
 # Architecture docs (local reference only)
 ARCHITECTURE/
 
+# Eval generated dumps (regenerate with eval/dump_artifacts.py)
+eval/artifacts/chunks.jsonl
+eval/__pycache__/
 # Environment and secrets
 .env
 .venv/
